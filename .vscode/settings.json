@@ -1,0 +1,10 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#0f4246",
+        "titleBar.activeBackground": "#15625f",
+        "titleBar.activeForeground": "#FDF9F6"
+    },
+    "Lua.diagnostics.globals": [
+        "love", "Object", "Vecotr"
+    ]
+}

@@ -7,3 +7,9 @@ Object = require 'libs.classic'
 Husl = require 'libs.husl'
 Inspect = require 'libs.inspect'
 Lume = require 'libs.lume'
+Utils = require 'libs.utils'
+
+-- Game states
+GAME_SCENES = {
+    game = require 'scenes.game',
+}

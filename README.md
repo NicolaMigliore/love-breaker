@@ -1,2 +1,2 @@
-# love2d-template
-Template repository for game development using LÖVE
+# Love Breaker
+A Brick Breaker game developed using LÖVE2D.
