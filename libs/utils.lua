@@ -10,6 +10,14 @@ function Utils.sign(number)
     return (number > 0 and 1) or (number == 0 and 0) or -1
 end
 
+--- Returns the middle of 3 numbers
+---@param n1 number one of the numbers to check
+---@param n2 number one of the numbers to check
+---@param n3 number one of the numbers to check
+function Utils.mid(n1,n2,n3)
+    return math.min(math.max(n1,n2), n3)
+end
+
 --- Return number with the provided decimal places
 ---@param number number number to round down
 ---@param decimals number number of decimal places to keep

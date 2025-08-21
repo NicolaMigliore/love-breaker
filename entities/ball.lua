@@ -9,22 +9,52 @@ function Ball:new(x,y,r)
     self.collision = false
 end
 
-function Ball:update(dt,paddle)
+function Ball:update(dt,paddle,bricks)
 
     local normVelocity = self.vel:normalized()
     self.pos = self.pos + normVelocity * self.speed
 
     self.collision = false
     -- check bounds collision
+    self:boundsCollision()
+
+    -- check paddle collisions
+    self:paddleCollision(paddle)
+
+    -- check bricks collision
+    self:brickCollision(bricks)
+end
+
+function Ball:draw()
+    love.graphics.setColor(1,1,1)
+
+    if self.collision then love.graphics.setColor(.6,.2,.2) end
+
+    love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
+    love.graphics.setColor(1,1,1)
+end
+
+--- Run collision checks with game bounds
+function Ball:boundsCollision()
     local maxX = love.graphics.getWidth()
     local maxY = love.graphics.getHeight()
 
     local invertX = (self.pos.x + self.rad > maxX) or (self.pos.x - self.rad < 0)
-    if invertX then self.vel.x = -self.vel.x end
-    local invertY = (self.pos.y + self.rad > maxY) or (self.pos.y - self.rad < 0)
-    if invertY then self.vel.y = -self.vel.y end
+    if invertX then
+        self.vel.x = -self.vel.x
+        self.pos.x = Utils.mid(0+self.rad, self.pos.x, maxX-self.rad)
+    end
 
-    -- check paddle collisions
+    local invertY = (self.pos.y + self.rad > maxY) or (self.pos.y - self.rad < 0)
+    if invertY then
+        self.vel.y = -self.vel.y
+        self.pos.y = Utils.mid(0+self.rad, self.pos.y, maxY-self.rad)
+    end
+end
+
+--- Run collision checks with the paddle and deflect the ball if necessary. 
+---@param paddle Paddle The paddle to check
+function Ball:paddleCollision(paddle)
     local paddleCollision = Utils.collisionCircRect(self.pos.x, self.pos.y, self.rad, paddle.pos.x, paddle.pos.y, paddle.w, paddle.h)
     self.collision = self.collision or paddleCollision
     if paddleCollision then
@@ -57,13 +87,20 @@ function Ball:update(dt,paddle)
     end
 end
 
-function Ball:draw()
-    love.graphics.setColor(1,1,1)
+--- Run collision checks with the bricks and deflect the ball if necessary. 
+---@param bricks Table<Brick> List of bricks to check
+function Ball:brickCollision(bricks)
+    for i,brick in ipairs(bricks) do
+        local brickCollision = Utils.collisionCircRect(self.pos.x, self.pos.y, self.rad, brick.pos.x, brick.pos.y, brick.w, brick.h)
+        self.collision = self.collision or brickCollision
+        brick.collision = brick.collision or brickCollision
 
-    if self.collision then love.graphics.setColor(.6,.2,.2) end
+        if brickCollision then
+            self.vel.y = -self.vel.y
 
-    love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
-    love.graphics.setColor(1,1,1)
+        end
+    end
+
 end
 
 return Ball
