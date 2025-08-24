@@ -3,12 +3,15 @@ local Paddle = Object:extend()
 function Paddle:new(x,y)
     self.pos = Vector(x,y)
     self.vel = Vector(0,0)
+    self.lastDir = Vector(1,0)
     self.w = 45
     self.h = 7
     self.speed = 6
 end
 
 function Paddle:update(dt)
+    if self.vel ~= Vector(0,0) then self.lastDir = self.vel:normalized() end
+
     self.vel.x = 0
     if KEY_DOWN.left then self.vel.x = -1 end
     if KEY_DOWN.right then self.vel.x = 1 end
@@ -21,7 +24,6 @@ function Paddle:update(dt)
     local maxX = love.graphics.getWidth()
     if self.pos.x < 0 then self.pos.x = 0 end
     if self.pos.x + self.w > maxX then self.pos.x = maxX - self.w end
-
 end
 
 function Paddle:draw()

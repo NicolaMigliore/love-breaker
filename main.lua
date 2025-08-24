@@ -6,6 +6,8 @@ KEYS = {
     a = 'left',
     right = 'right',
     d = 'right',
+    r = 'r',
+    space = 'space',
 }
 KEY_DOWN = {}
 

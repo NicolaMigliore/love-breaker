@@ -1,16 +1,40 @@
 local Ball = require 'entities.ball'
 local Paddle = require 'entities.paddle'
 local Brick = require 'entities.brick'
+local TriggerRect = require 'entities.triggerRect'
+
 local Game = {
     balls = {},
     paddle = nil,
     bricks = {},
+    gameOverTrigger = nil,
+    isServing = true,
+    score = 0,
+    -- lives = 3,
 }
 
 function Game:enter()
+    love.graphics.setFont(FONTS.robotic)
+
+    self.score = 0
+    self.isServing = true
+
+    -- setup entities
     table.insert(self.balls, Ball(64,128,4))
     self.paddle = Paddle(128,230)
     self.bricks = self:generateBricks()
+    self.gameOverTrigger = TriggerRect(0,self.paddle.pos.y+self.paddle.h,256,100,function(ball)
+        local index = Lume.find(self.balls, ball)
+        if index then table.remove(self.balls, index) end
+        self.score = self.score - 100
+        if #self.balls == 0 then
+            -- self.lives = self.lives - 1
+            
+            -- if self.lives <= 0 then
+                GameState.switch(GAME_SCENES.gameOver)
+            -- end
+        end
+    end)
 end
 
 function Game:update(dt)
@@ -18,17 +42,30 @@ function Game:update(dt)
     for i, ball in ipairs(self.balls) do
         ball:update(dt, self.paddle, self.bricks)
     end
-    
+
+    if self.isServing then
+        local nextBall = self.balls[#self.balls]
+        nextBall.pos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-nextBall.rad-1)
+        nextBall.vel.x = math.abs(nextBall.vel.x) * Utils.sign(self.paddle.lastDir.x)
+
+        if KEY_DOWN.space then self.isServing = false nextBall.speed = 2 end
+    end
+
     self.paddle:update(dt)
 
     -- update bricks
     for i, brick in ipairs(self.bricks) do
         if brick.collision then
             table.remove(self.bricks,i)
+            self.score = self.score + 10
         else
             brick:update(dt)
         end
     end
+
+    -- update trigger
+    self.gameOverTrigger:update(dt, self.balls)
+    if #self.bricks == 0 then GameState.switch(GAME_SCENES.gameOver) end
 end
 
 function Game:draw()
@@ -42,23 +79,29 @@ function Game:draw()
         ball:draw()
     end
 
+    if self.isServing then
+        local nextBall = self.balls[#self.balls]
+        local p1 = nextBall.pos
+        local p2 = nextBall.pos + (nextBall.vel * 15)
+        love.graphics.line(p1.x,p1.y,p2.x,p2.y)
+    end
+
     self.paddle:draw()
 
     -- draw bricks
     for i, brick in ipairs(self.bricks) do
         brick:draw()
     end
-end
 
--- function Game:keyreleased(key)
---     if key == 'left' then
---         self.paddle:move
---     elseif key == 'right' then
---         Buttons.selectNext()
---     elseif
---         Buttons.active:onClick()
---     end
--- end
+    self.gameOverTrigger:draw()
+
+    -- UI
+    love.graphics.setColor(0,0,0)
+    love.graphics.rectangle('fill',0,241,256,20)
+    love.graphics.setColor(1,1,1)
+    -- love.graphics.print('SCORE: '..self.score,5,244)
+    Utils.printLabel('SCORE: '..self.score,251,250,ALIGNMENTS.right)
+end
 
 function Game:generateBricks()
     local bricks = {}
