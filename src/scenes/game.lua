@@ -10,7 +10,7 @@ local Game = {
     gameOverTrigger = nil,
     isServing = true,
     score = 0,
-    -- lives = 3,
+    lives = 3,
 }
 
 function Game:enter()
@@ -20,23 +20,28 @@ function Game:enter()
     self.isServing = true
 
     -- setup entities
-    table.insert(self.balls, Ball(64,128,4))
-
+    
     local pw = 70
     self.paddle = Paddle(FIXED_WIDTH/2-pw/2,FIXED_HEIGHT-30,pw,7)
+    
+    local rad = 4
+    local nextPos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-rad-1)
+    table.insert(self.balls, Ball(nextPos.x, nextPos.y,rad))
 
     self.bricks = self:generateBricks()
 
     self.gameOverTrigger = TriggerRect(0,self.paddle.pos.y+self.paddle.h,FIXED_WIDTH,100,function(ball)
         local index = Lume.find(self.balls, ball)
         if index then table.remove(self.balls, index) end
-        self.score = self.score - 100
+        self.score = self.score - 20
         if #self.balls == 0 then
-            -- self.lives = self.lives - 1
+            self.lives = self.lives - 1
             
-            -- if self.lives <= 0 then
+            if self.lives <= 0 then
                 GameState.switch(GAME_SCENES.gameOver)
-            -- end
+            else
+                self:serveBall()
+            end
         end
     end)
 end
@@ -69,7 +74,10 @@ function Game:update(dt)
 
     -- update trigger
     self.gameOverTrigger:update(dt, self.balls)
-    if #self.bricks == 0 then GameState.switch(GAME_SCENES.gameOver) end
+    if #self.bricks == 0 then
+        self.score = self.score + self.lives*50
+        GameState.switch(GAME_SCENES.gameOver)
+    end
 end
 
 function Game:draw()
@@ -106,9 +114,17 @@ function Game:draw()
     love.graphics.rectangle('fill',0,FIXED_HEIGHT-20,FIXED_WIDTH,20)
     love.graphics.setColor(1,1,1)
     -- love.graphics.print('SCORE: '..self.score,5,244)
-    Utils.printLabel('SCORE: '..self.score,FIXED_WIDTH-5,FIXED_HEIGHT-10,ALIGNMENTS.right)
+    Utils.printLabel('LIVES: '..self.lives..'   SCORE: '..self.score,FIXED_WIDTH-5,FIXED_HEIGHT-10,ALIGNMENTS.right)
 
     Push:finish()
+end
+
+function Game:serveBall()
+    self.isServing = true
+
+    local rad = 4
+    local nextPos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-rad-1)
+    table.insert(self.balls, Ball(nextPos.x,nextPos.y,rad))
 end
 
 function Game:generateBricks()

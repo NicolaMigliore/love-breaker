@@ -21,7 +21,7 @@ function Paddle:update(dt)
     self.pos = self.pos + self.vel
 
     -- check bounds
-    local maxX = love.graphics.getWidth()
+    local maxX = FIXED_WIDTH
     if self.pos.x < 0 then self.pos.x = 0 end
     if self.pos.x + self.w > maxX then self.pos.x = maxX - self.w end
 end
