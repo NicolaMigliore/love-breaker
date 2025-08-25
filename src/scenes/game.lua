@@ -20,10 +20,10 @@ function Game:enter()
     self.isServing = true
 
     -- setup entities
-    
     local pw = 70
     self.paddle = Paddle(FIXED_WIDTH/2-pw/2,FIXED_HEIGHT-30,pw,7)
     
+    self.balls = {}
     local rad = 4
     local nextPos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-rad-1)
     table.insert(self.balls, Ball(nextPos.x, nextPos.y,rad))
@@ -57,7 +57,7 @@ function Game:update(dt)
         nextBall.pos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-nextBall.rad-1)
         nextBall.vel.x = math.abs(nextBall.vel.x) * Utils.sign(self.paddle.lastDir.x)
 
-        if KEY_DOWN.space then self.isServing = false nextBall.speed = 2 end
+        if KEY_DOWN.space then self.isServing = false nextBall.speed = 200 end
     end
 
     self.paddle:update(dt)

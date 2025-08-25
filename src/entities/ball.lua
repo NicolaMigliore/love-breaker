@@ -22,7 +22,7 @@ function Ball:update(dt,paddle,bricks)
     -- if #self.trail > self.trailMax then table.remove(self.trail, 1) end
 
     local normVelocity = self.vel:normalized()
-    self.pos = self.pos + normVelocity * self.speed
+    self.pos = self.pos + normVelocity * self.speed * dt
 
     self.collision = false
     -- check bounds collision
