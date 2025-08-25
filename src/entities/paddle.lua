@@ -13,8 +13,8 @@ function Paddle:update(dt)
     if self.vel ~= Vector(0,0) then self.lastDir = self.vel:normalized() end
 
     self.vel.x = 0
-    if KEY_DOWN.left then self.vel.x = -1 end
-    if KEY_DOWN.right then self.vel.x = 1 end
+    if INPUT:down('left') then self.vel.x = -1 end
+    if INPUT:down('right') then self.vel.x = 1 end
 
     local normVelocity = self.vel:normalized()
     self.vel = normVelocity * self.speed

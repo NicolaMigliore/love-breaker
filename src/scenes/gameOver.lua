@@ -8,7 +8,7 @@ function GameOver:enter(previous)
 end
 
 function GameOver:update(dt)
-    if KEY_DOWN.r then GameState.switch(GAME_SCENES.game) end
+    if INPUT:down('reload')then GameState.switch(GAME_SCENES.game) end
 end
 
 function GameOver:draw()

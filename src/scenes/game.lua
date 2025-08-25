@@ -57,7 +57,7 @@ function Game:update(dt)
         nextBall.pos = Vector(self.paddle.pos.x+self.paddle.w/2, self.paddle.pos.y-nextBall.rad-1)
         nextBall.vel.x = math.abs(nextBall.vel.x) * Utils.sign(self.paddle.lastDir.x)
 
-        if KEY_DOWN.space then self.isServing = false nextBall.speed = 200 end
+        if INPUT:down('action1') then self.isServing = false nextBall.speed = 200 end
     end
 
     self.paddle:update(dt)
