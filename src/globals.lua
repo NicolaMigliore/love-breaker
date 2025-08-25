@@ -7,7 +7,12 @@ Object = require 'libs.classic'
 Husl = require 'libs.husl'
 Inspect = require 'libs.inspect'
 Lume = require 'libs.lume'
+Push = require 'libs.push'
 Utils = require 'libs.utils'
+
+-- Settings
+FIXED_WIDTH = 360
+FIXED_HEIGHT = 360
 
 -- Fonts
 local fontScale = 7

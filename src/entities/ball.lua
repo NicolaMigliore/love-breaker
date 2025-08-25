@@ -51,8 +51,8 @@ end
 
 --- Run collision checks with game bounds
 function Ball:boundsCollision()
-    local maxX = love.graphics.getWidth()
-    local maxY = love.graphics.getHeight()
+    local maxX = FIXED_WIDTH
+    local maxY = FIXED_HEIGHT
 
     local invertX = (self.pos.x + self.rad > maxX) or (self.pos.x - self.rad < 0)
     if invertX then

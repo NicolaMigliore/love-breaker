@@ -1,10 +1,10 @@
 local Brick = Object:extend()
 
-function Brick:new(x,y)
+function Brick:new(x,y,w,h)
     self.pos = Vector(x,y)
     self.vel = Vector(0,0)
-    self.w = 20
-    self.h = 8
+    self.w = w
+    self.h = h
     self.collision = false
 end
 

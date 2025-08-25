@@ -12,9 +12,11 @@ function GameOver:update(dt)
 end
 
 function GameOver:draw()
+    Push:start()
     love.graphics.setColor(1,1,1)
-    Utils.printLabel('SCORE: '..self.score,128,128,ALIGNMENTS.center)
-    Utils.printLabel('PRESS "R" TO RESTART',128,200,ALIGNMENTS.center)
+    Utils.printLabel('SCORE: '..self.score,FIXED_WIDTH/2,128,ALIGNMENTS.center)
+    Utils.printLabel('PRESS "R" TO RESTART',FIXED_WIDTH/2,200,ALIGNMENTS.center)
+    Push:finish()
 end
 
 return GameOver

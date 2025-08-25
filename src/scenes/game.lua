@@ -21,9 +21,13 @@ function Game:enter()
 
     -- setup entities
     table.insert(self.balls, Ball(64,128,4))
-    self.paddle = Paddle(128,230)
+
+    local pw = 70
+    self.paddle = Paddle(FIXED_WIDTH/2-pw/2,FIXED_HEIGHT-30,pw,7)
+
     self.bricks = self:generateBricks()
-    self.gameOverTrigger = TriggerRect(0,self.paddle.pos.y+self.paddle.h,256,100,function(ball)
+
+    self.gameOverTrigger = TriggerRect(0,self.paddle.pos.y+self.paddle.h,FIXED_WIDTH,100,function(ball)
         local index = Lume.find(self.balls, ball)
         if index then table.remove(self.balls, index) end
         self.score = self.score - 100
@@ -69,8 +73,10 @@ function Game:update(dt)
 end
 
 function Game:draw()
+    Push:start()
+    
     love.graphics.setColor(.12,.14,.25)
-    love.graphics.rectangle('fill',0,0,256,256)
+    love.graphics.rectangle('fill',0,0,FIXED_WIDTH,FIXED_HEIGHT)
 
     love.graphics.setColor(1,1,1,1)
 
@@ -97,19 +103,23 @@ function Game:draw()
 
     -- UI
     love.graphics.setColor(0,0,0)
-    love.graphics.rectangle('fill',0,241,256,20)
+    love.graphics.rectangle('fill',0,FIXED_HEIGHT-20,FIXED_WIDTH,20)
     love.graphics.setColor(1,1,1)
     -- love.graphics.print('SCORE: '..self.score,5,244)
-    Utils.printLabel('SCORE: '..self.score,251,250,ALIGNMENTS.right)
+    Utils.printLabel('SCORE: '..self.score,FIXED_WIDTH-5,FIXED_HEIGHT-10,ALIGNMENTS.right)
+
+    Push:finish()
 end
 
 function Game:generateBricks()
     local bricks = {}
     for row=1,4 do
-        local y = 10+row*12
+        local h = 10
+        local y = 10+row*(h + 4)
         for i=0,9 do
-            local x = 10+i*24
-            local b = Brick(x,y)
+            local w = 30
+            local x = 10+i*(w + 4)
+            local b = Brick(x,y,w,h)
             table.insert(bricks,b)
         end
     end

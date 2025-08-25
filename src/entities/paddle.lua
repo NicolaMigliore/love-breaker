@@ -1,11 +1,11 @@
 local Paddle = Object:extend()
 
-function Paddle:new(x,y)
+function Paddle:new(x,y,w,h)
     self.pos = Vector(x,y)
     self.vel = Vector(0,0)
     self.lastDir = Vector(1,0)
-    self.w = 45
-    self.h = 7
+    self.w = w
+    self.h = h
     self.speed = 6
 end
 
