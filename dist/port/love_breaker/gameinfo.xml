@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Love Breaker.sh</path>
+    <name>Love Breaker</name>
+    <desc>Simple brick breaker game developed using Love2D</desc>
+    <releasedate>20250824T000000</releasedate>
+    <developer>Elfamir</developer>
+    <publisher>no publisher</publisher>
+    <genre>Arcade</genre>
+    <image>./screenshot.png</image>
+  </game>
+</gameList>

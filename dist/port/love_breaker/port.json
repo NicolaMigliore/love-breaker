@@ -1,0 +1,30 @@
+{
+	"version": 4,
+	"name": "love-breaker_0.1.0.zip",
+	"items": ["Love Breaker.sh", "love_breaker"],
+	"items_opt": [],
+	"attr": {
+		"title": "Love Breaker",
+		"porter": ["Elfamir"],
+		"desc": "Simple brick breaker game developed using Love2D",
+		"desc_md": null,
+		"inst": "This is my first attempt at porting a love2d game using portmaster. I am not sure what instructions should be written here...",
+		"inst_md": null,
+		"genres": ["arcade"],
+		"image": null,
+		"rtr": true,
+		"exp": true,
+		"runtime": [],
+		"store": [
+			{
+				"name": "",
+				"gameurl": "",
+				"developerurl": "https://linktr.ee/Elfamir"
+			}
+		],
+		"availability": "full",
+		"reqs": [],
+		"arch": ["aarch64"],
+		"min_glibc": ""
+	}
+}
