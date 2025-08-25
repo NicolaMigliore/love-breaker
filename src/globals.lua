@@ -25,7 +25,8 @@ FONTS = {
     default = default,
     pixelated = pixelated,
     -- C:\Users\Nick\Documents\MyProjects\love-breaker\assets\fonts\Robotic_Rancor.ttf
-    robotic = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf',fontScale)
+    robotic = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf',fontScale),
+    robotic_l = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf',fontScale*2),
 }
 
 ALIGNMENTS = {
