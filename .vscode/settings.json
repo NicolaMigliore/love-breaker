@@ -16,6 +16,8 @@
         "indentation": {
             "useTab": true,
             "indentSize": 4
-        }
+        },
+        "lineLength": 200,
+        "callArgs": "chopdown"
     }
 }
