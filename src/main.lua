@@ -1,4 +1,6 @@
 require 'globals'
+local UIClass = require 'ui'
+local UI
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
@@ -10,10 +12,7 @@ function love.load()
 		{ fullscreen = false, resizable = true, pixelperfect = true })
 
 	-- UI setup
-	Luis.baseWidth = windowWidth
-	Luis.baseHeight = windowHeight
-	Luis.setGridSize(18)
-	Luis.initJoysticks()
+	UI = UIClass(windowWidth, windowHeight)
 
 	-- game states setup
 	GameState.registerEvents()
@@ -33,19 +32,7 @@ function love.load()
 end
 
 function love.update(dt)
-	TIME = TIME + dt
-	if TIME >= 1 / 60 then
-		Luis.flux.update(TIME)
-		TIME = 0
-	end
-	Luis.updateScale()
-	Luis.update(dt)
-	if Luis.joystickJustPressed(1, 'dpdown') then
-		Luis.moveFocus("next")
-	elseif Luis.joystickJustPressed(1, 'dpup') then
-		Luis.moveFocus("previous")
-	end
-
+	UI:update(dt)
 	INPUT:update()
 end
 
@@ -57,35 +44,29 @@ function love.resize(w, h)
 end
 
 function love.mousepressed(x, y, button, istouch)
-	Luis.mousepressed(x, y, button, istouch)
+	UI:mousepressed(x, y, button, istouch)
 end
 
 function love.mousereleased(x, y, button, istouch)
-	Luis.mousereleased(x, y, button, istouch)
+	UI:mousereleased(x, y, button, istouch)
 end
 
 function love.keypressed(key)
-	if key == "tab" then -- Debug View
-		Luis.showGrid = not Luis.showGrid
-		Luis.showLayerNames = not Luis.showLayerNames
-		Luis.showElementOutlines = not Luis.showElementOutlines
-	else
-		Luis.keypressed(key)
-	end
+	UI:keypressed(key)
 end
 
 function love.joystickadded(joystick)
-	Luis.initJoysticks()
+	UI:joystickadded(joystick)
 end
 
 function love.joystickremoved(joystick)
-	Luis.removeJoystick(joystick)
+	UI:joystickremoved(joystick)
 end
 
 function love.gamepadpressed(joystick, button)
-	Luis.gamepadpressed(joystick, button)
+	UI:gamepadpressed(joystick, button)
 end
 
 function love.gamepadreleased(joystick, button)
-	Luis.gamepadreleased(joystick, button)
+	UI:gamepadreleased(joystick, button)
 end
