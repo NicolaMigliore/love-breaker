@@ -117,9 +117,8 @@ function Game:draw()
 	love.graphics.setColor(0, 0, 0)
 	love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 20, FIXED_WIDTH, 20)
 	love.graphics.setColor(1, 1, 1)
-	-- love.graphics.print('SCORE: '..self.score,5,244)
-	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 10,
-		ALIGNMENTS.right)
+
+	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 10, ALIGNMENTS.right)
 
 	Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 10, ALIGNMENTS.left)
 
@@ -136,12 +135,12 @@ end
 
 function Game:generateBricks()
 	local bricks = {}
-	for row = 1, 4 do
-		local h = 10
+	for row = 1, 6 do
+		local h = 12
 		local y = 10 + row * (h + 4)
-		for i = 0, 9 do
-			local w = 30
-			local x = 10 + i * (w + 4)
+		for i = 0, 6 do
+			local w = 40
+			local x = 26 + i * (w + 4)
 			local b = Brick(x, y, w, h)
 			table.insert(bricks, b)
 		end
