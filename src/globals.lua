@@ -11,6 +11,10 @@ Push = require 'libs.push'
 Baton = require 'libs.baton'
 Utils = require 'libs.utils'
 
+local initLuis = require 'luis.init'
+Luis = initLuis("luis/widgets")
+Luis.flux = require("luis.3rdparty.flux")
+
 -- Settings
 FIXED_WIDTH = 360
 FIXED_HEIGHT = 360
@@ -38,6 +42,9 @@ ALIGNMENTS = {
 
 -- Game states
 GAME_SCENES = {
+    title = require 'scenes.title',
     game = require 'scenes.game',
     gameOver = require 'scenes.gameOver',
 }
+
+TIME = 0
