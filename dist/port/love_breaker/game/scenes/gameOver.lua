@@ -8,13 +8,21 @@ function GameOver:enter(previous)
 end
 
 function GameOver:update(dt)
-    if KEY_DOWN.r then GameState.switch(GAME_SCENES.game) end
+    if INPUT:down('reload')then GameState.switch(GAME_SCENES.game) end
 end
 
 function GameOver:draw()
-    love.graphics.setColor(1,1,1)
-    Utils.printLabel('SCORE: '..self.score,128,128,ALIGNMENTS.center)
-    Utils.printLabel('PRESS "R" TO RESTART',128,200,ALIGNMENTS.center)
+    Push:start()
+
+    love.graphics.setFont(FONTS.robotic_l)
+    love.graphics.setColor(1,1,1,1)
+    Utils.printLabel('SCORE: '..self.score,FIXED_WIDTH/2,128,ALIGNMENTS.center)
+    
+    love.graphics.setFont(FONTS.robotic)
+    local alfa = (math.sin(love.timer.getTime()*4) + 1) * 0.25 + 0.5
+    love.graphics.setColor(1,1,1,alfa)
+    Utils.printLabel('PRESS "R" TO RESTART',FIXED_WIDTH/2,200,ALIGNMENTS.center)
+    Push:finish()
 end
 
 return GameOver

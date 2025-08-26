@@ -22,7 +22,7 @@ function Ball:update(dt,paddle,bricks)
     -- if #self.trail > self.trailMax then table.remove(self.trail, 1) end
 
     local normVelocity = self.vel:normalized()
-    self.pos = self.pos + normVelocity * self.speed
+    self.pos = self.pos + normVelocity * self.speed * dt
 
     self.collision = false
     -- check bounds collision
@@ -51,8 +51,8 @@ end
 
 --- Run collision checks with game bounds
 function Ball:boundsCollision()
-    local maxX = love.graphics.getWidth()
-    local maxY = love.graphics.getHeight()
+    local maxX = FIXED_WIDTH
+    local maxY = FIXED_HEIGHT
 
     local invertX = (self.pos.x + self.rad > maxX) or (self.pos.x - self.rad < 0)
     if invertX then
