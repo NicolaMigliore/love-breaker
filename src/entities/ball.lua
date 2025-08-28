@@ -1,7 +1,5 @@
 local Ball = Object:extend()
 
-
-
 function Ball:new(x, y, r)
 	self.pos = Vector(x, y)
 	self.rad = r
@@ -34,7 +32,7 @@ function Ball:update(dt, paddle, bricks)
 	self:brickCollision(bricks)
 end
 
-function Ball:draw()
+function Ball:draw(style)
 	love.graphics.setColor(1, 1, 1)
 
 	-- -- draw particles
@@ -42,9 +40,13 @@ function Ball:draw()
 	--     love.graphics.circle('fill', tp.x, tp.y, (self.rad-2) *(i/self.trailMax))
 	-- end
 
-	if self.collision then love.graphics.setColor(.6, .2, .2) end
-
-	love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
+	if style == STYLES.basic then
+		love.graphics.rectangle('fill', self.pos.x-self.rad, self.pos.y-self.rad, self.rad*2, self.rad*2)
+	else
+		-- default draw
+		if self.collision then love.graphics.setColor(.6, .2, .2) end
+		love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
+	end
 	love.graphics.setColor(1, 1, 1)
 end
 

@@ -1,4 +1,3 @@
-
 -- Load libraries
 Camera = require 'libs.hump.camera'
 GameState = require 'libs.hump.gamestate'
@@ -27,24 +26,29 @@ pixelated:setFilter("nearest")
 love.graphics.setFont(pixelated)
 
 FONTS = {
-    default = default,
-    pixelated = pixelated,
-    -- C:\Users\Nick\Documents\MyProjects\love-breaker\assets\fonts\Robotic_Rancor.ttf
-    robotic = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf',fontScale),
-    robotic_l = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf',fontScale*2),
+	default = default,
+	pixelated = pixelated,
+	-- C:\Users\Nick\Documents\MyProjects\love-breaker\assets\fonts\Robotic_Rancor.ttf
+	robotic = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf', fontScale),
+	robotic_l = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf', fontScale * 2),
 }
 
 ALIGNMENTS = {
-    left = 'left',
-    right = 'right',
-    center = 'center',
+	left = 'left',
+	right = 'right',
+	center = 'center',
+}
+
+STYLES = {
+	default = 'default',
+	basic = 'basic',
 }
 
 -- Game states
 GAME_SCENES = {
-    title = require 'scenes.title',
-    game = require 'scenes.game',
-    gameOver = require 'scenes.gameOver',
+	title = require 'scenes.title',
+	game = require 'scenes.game',
+	gameOver = require 'scenes.gameOver',
 }
 
 TIME = 0

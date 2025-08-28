@@ -11,6 +11,7 @@ local Game = {
 	isServing = true,
 	score = 0,
 	lives = 3,
+	style = 'basic',
 }
 
 function Game:enter()
@@ -94,7 +95,7 @@ function Game:draw()
 
 	-- draw balls
 	for i, ball in ipairs(self.balls) do
-		ball:draw()
+		ball:draw(self.style)
 	end
 
 	if self.isServing then
@@ -104,11 +105,11 @@ function Game:draw()
 		love.graphics.line(p1.x, p1.y, p2.x, p2.y)
 	end
 
-	self.paddle:draw()
+	self.paddle:draw(self.style)
 
 	-- draw bricks
 	for i, brick in ipairs(self.bricks) do
-		brick:draw()
+		brick:draw(self.style)
 	end
 
 	self.gameOverTrigger:draw()

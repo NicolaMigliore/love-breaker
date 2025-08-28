@@ -15,10 +15,15 @@ function Brick:update(dt)
 	end
 end
 
-function Brick:draw()
+function Brick:draw(style)
 	love.graphics.setColor(1, 1, 1)
-	if self.collision then love.graphics.setColor(.6, .2, .2) end
-	love.graphics.rectangle('fill', self.pos.x, self.pos.y, self.w, self.h)
+
+	if style == STYLES.basic then
+		love.graphics.rectangle('fill', self.pos.x, self.pos.y, self.w, self.h)
+	else
+		if self.collision then love.graphics.setColor(.6, .2, .2) end
+		love.graphics.rectangle('fill', self.pos.x, self.pos.y, self.w, self.h)
+	end
 end
 
 return Brick
