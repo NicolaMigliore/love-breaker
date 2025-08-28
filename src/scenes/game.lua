@@ -11,7 +11,7 @@ local Game = {
 	isServing = true,
 	score = 0,
 	lives = 3,
-	style = 'basic',
+	style = 'textured',
 }
 
 function Game:enter()

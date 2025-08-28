@@ -7,7 +7,8 @@ function Ball:new(x, y, r)
 	local angle = -math.pi / 4
 	self.vel = Vector.fromPolar(angle, 1) --Vector(1,1)
 	self.collision = false
-
+	self.textures = love.graphics.newImage('assets/textures/ball.png')
+	self.quads = self:getQuads()
 
 	-- -- TODO: implement advanced trails (https://love2d.org/forums/viewtopic.php?p=247592#p247592)
 	-- self.trail = {}
@@ -41,7 +42,10 @@ function Ball:draw(style)
 	-- end
 
 	if style == STYLES.basic then
-		love.graphics.rectangle('fill', self.pos.x-self.rad, self.pos.y-self.rad, self.rad*2, self.rad*2)
+		love.graphics.rectangle('fill', (self.pos.x - self.rad), (self.pos.y - self.rad), (self.rad * 2), (self.rad * 2))
+	elseif style == STYLES.textured then 
+		local quad = self.quads[style]
+		love.graphics.draw(self.textures, quad, (self.pos.x - self.rad), (self.pos.y - self.rad))
 	else
 		-- default draw
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
@@ -139,6 +143,12 @@ function Ball:brickCollision(bricks)
 			end
 		end
 	end
+end
+
+function Ball:getQuads()
+	return {
+		textured = love.graphics.newQuad(0, 0, 8, 8, self.textures:getWidth(), self.textures:getHeight())
+	}
 end
 
 return Ball

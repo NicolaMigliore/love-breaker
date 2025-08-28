@@ -7,6 +7,8 @@ function Paddle:new(x, y, w, h)
 	self.w = w
 	self.h = h
 	self.speed = 6
+	self.textures = love.graphics.newImage('assets/textures/paddle.png')
+	self.quads = self:getQuads()
 end
 
 function Paddle:update(dt)
@@ -26,8 +28,23 @@ function Paddle:update(dt)
 	if self.pos.x + self.w > maxX then self.pos.x = maxX - self.w end
 end
 
-function Paddle:draw()
-	love.graphics.rectangle('fill', self.pos.x, self.pos.y, self.w, self.h)
+function Paddle:draw(style)
+	love.graphics.setColor(1, 1, 1, 1)
+	if style == STYLES.textured then 
+		local quad = self.quads[style]
+		love.graphics.draw(self.textures, quad, self.pos.x, self.pos.y)
+	else
+		-- default draw
+		if self.collision then love.graphics.setColor(.6, .2, .2) end
+		love.graphics.rectangle('fill', self.pos.x, self.pos.y, self.w, self.h)
+	end
+	love.graphics.setColor(1, 1, 1)
+end
+
+function Paddle:getQuads()
+	return {
+		textured = love.graphics.newQuad(0, 0, 70, 7, self.textures:getWidth(), self.textures:getHeight())
+	}
 end
 
 return Paddle

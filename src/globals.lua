@@ -42,6 +42,7 @@ ALIGNMENTS = {
 STYLES = {
 	default = 'default',
 	basic = 'basic',
+	textured = 'textured',
 }
 
 -- Game states
