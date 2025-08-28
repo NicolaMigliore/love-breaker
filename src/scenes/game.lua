@@ -68,7 +68,7 @@ function Game:update(dt)
 
 	-- update bricks
 	for i, brick in ipairs(self.bricks) do
-		if brick.collision then
+		if brick.collision and brick.breakTimer and brick.breakTimer <= 0 then
 			table.remove(self.bricks, i)
 			self.score = self.score + 10
 		else
