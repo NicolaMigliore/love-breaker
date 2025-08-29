@@ -15,11 +15,12 @@ Luis = initLuis("luis/widgets")
 Luis.flux = require("luis.3rdparty.flux")
 
 -- Settings
-FIXED_WIDTH = 360
-FIXED_HEIGHT = 360
+SCALE = 2
+FIXED_WIDTH = 360 * SCALE
+FIXED_HEIGHT = 360 * SCALE
 
 -- Fonts
-local fontScale = 7
+local fontScale = 7 * SCALE
 local default = love.graphics.getFont()
 local pixelated = love.graphics.newFont(fontScale, "mono")
 pixelated:setFilter("nearest")

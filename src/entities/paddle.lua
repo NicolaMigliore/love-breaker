@@ -30,9 +30,10 @@ end
 
 function Paddle:draw(style)
 	love.graphics.setColor(1, 1, 1, 1)
-	if style == STYLES.textured then 
-		local quad = self.quads[style]
-		love.graphics.draw(self.textures, quad, self.pos.x, self.pos.y)
+	if style == STYLES.textured then
+		local quadW, quadH, quad = self.quads[style].w, self.quads[style].h, self.quads[style].quad
+		local scaleX, scaleY = self.w / quadW, self.h / quadH
+		love.graphics.draw(self.textures, quad, self.pos.x, self.pos.y, 0, scaleX, scaleY)
 	else
 		-- default draw
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
@@ -42,8 +43,13 @@ function Paddle:draw(style)
 end
 
 function Paddle:getQuads()
+	local w, h = 70, 7
 	return {
-		textured = love.graphics.newQuad(0, 0, 70, 7, self.textures:getWidth(), self.textures:getHeight())
+		textured = {
+			w = w,
+			h = h,
+			quad = love.graphics.newQuad(0, 0, w, h, self.textures:getWidth(), self.textures:getHeight()),
+		}
 	}
 end
 

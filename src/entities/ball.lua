@@ -6,7 +6,10 @@ function Ball:new(x, y, r)
 	self.speed = 0
 	local angle = -math.pi / 4
 	self.vel = Vector.fromPolar(angle, 1) --Vector(1,1)
+	self.collisionTimer = 0
 	self.collision = false
+	self.collisionX = 0
+	self.collisionY = 0
 	self.textures = love.graphics.newImage('assets/textures/ball.png')
 	self.quads = self:getQuads()
 
@@ -22,7 +25,10 @@ function Ball:update(dt, paddle, bricks)
 	local normVelocity = self.vel:normalized()
 	self.pos = self.pos + normVelocity * self.speed * dt
 
-	self.collision = false
+	if self.collisionX > 0 then self.collisionX = self.collisionX - dt end
+	if self.collisionY > 0 then self.collisionY = self.collisionY - dt end
+	self.collision = self.collisionX > 0 or self.collisionY > 0
+
 	-- check bounds collision
 	self:boundsCollision()
 
@@ -33,8 +39,11 @@ function Ball:update(dt, paddle, bricks)
 	self:brickCollision(bricks)
 end
 
+-- MARK: draw
 function Ball:draw(style)
 	love.graphics.setColor(1, 1, 1)
+
+	if DEBUG then love.graphics.circle('line', self.pos.x, self.pos.y, self.rad) end
 
 	-- -- draw particles
 	-- for i, tp in ipairs(self.trail) do
@@ -43,9 +52,13 @@ function Ball:draw(style)
 
 	if style == STYLES.basic then
 		love.graphics.rectangle('fill', (self.pos.x - self.rad), (self.pos.y - self.rad), (self.rad * 2), (self.rad * 2))
-	elseif style == STYLES.textured then 
-		local quad = self.quads[style]
-		love.graphics.draw(self.textures, quad, (self.pos.x - self.rad), (self.pos.y - self.rad))
+	elseif style == STYLES.textured then
+		local quadSize, quadIndex = 10, 1
+		if self.collisionY > 0 then quadIndex = 2 end
+		if self.collisionX > 0 then quadIndex = 3 end
+		local quad = self.quads[style][quadIndex]
+		local scale = (self.rad * 2) / quadSize
+		love.graphics.draw(self.textures, quad, (self.pos.x - quadSize * scale / 2), (self.pos.y - quadSize * scale / 2), 0, scale, scale)
 	else
 		-- default draw
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
@@ -63,19 +76,21 @@ function Ball:boundsCollision()
 	if invertX then
 		self.vel.x = -self.vel.x
 		self.pos.x = Utils.mid(0 + self.rad, self.pos.x, maxX - self.rad)
+		self.collisionX = .1
 	end
 
 	local invertY = (self.pos.y + self.rad > maxY) or (self.pos.y - self.rad < 0)
 	if invertY then
 		self.vel.y = -self.vel.y
 		self.pos.y = Utils.mid(0 + self.rad, self.pos.y, maxY - self.rad)
+		self.collisionY = .1
 	end
 end
 
 --- Run collision checks with the paddle and deflect the ball if necessary.
 ---@param paddle Paddle The paddle to check
 function Ball:paddleCollision(paddle)
-	local paddleCollision, collRectLeft, collRectRight, collRectTop, collRectBottom = Utils.collisionCircRect(
+	local paddleCollision, responseVector = Utils.collisionCircRect(
 		self.pos.x,
 		self.pos.y,
 		self.rad,
@@ -85,16 +100,17 @@ function Ball:paddleCollision(paddle)
 		paddle.h
 	)
 	self.collision = self.collision or paddleCollision
-	if paddleCollision then
+	if paddleCollision and responseVector then
 		-- deflect vertically
-		if collRectTop or collRectBottom then
+		if responseVector.y ~= 0 then
 			self.vel.y = -self.vel.y
 			self.pos.y = paddle.pos.y - self.rad
+			self.collisionY = .1
 		end
 
 		-- deflect horizontally
 		local same_dir = Utils.sign(self.vel.x) == Utils.sign(paddle.vel.x)
-		local hit_sides = collRectLeft or collRectRight
+		local hit_sides = responseVector.x ~= 0
 
 		-- round angle values to avoid float rounding errors
 		local cur_angle = Utils.round(math.atan2(self.vel.y, self.vel.x), 4)
@@ -102,7 +118,8 @@ function Ball:paddleCollision(paddle)
 		local is60or120Deg = (Utils.round(-math.pi / 3, 4) == cur_angle) or (Utils.round(-math.pi * 2 / 3, 4) == cur_angle)                                                               -- 60°
 
 		if hit_sides and (not same_dir or paddle.vel.x == 0) then
-			self.vel.x = -self.vel.x
+			self.vel.x = math.abs(self.vel.x) * Utils.sign(responseVector.x)
+			self.collisionX = .1
 		elseif paddle.vel.x ~= 0 then
 			local dir = Utils.sign(self.vel.x)
 			-- raise angle
@@ -122,7 +139,7 @@ end
 function Ball:brickCollision(bricks)
 	for i, brick in ipairs(bricks) do
 		if not brick.collision then
-			local brickCollision, collRectLeft, collRectRight, collRectTop, collRectBottom = Utils.collisionCircRect(
+			local brickCollision, responseVector = Utils.collisionCircRect(
 				self.pos.x,
 				self.pos.y,
 				self.rad,
@@ -132,14 +149,33 @@ function Ball:brickCollision(bricks)
 				brick.h
 			)
 			self.collision = self.collision or brickCollision
-			brick.collision = brick.collision or brickCollision
+			brick.collision = brickCollision
 
-			if brickCollision then
-				if collRectTop or collRectBottom then
-					self.vel.y = -self.vel.y
-				elseif collRectLeft or collRectRight then
-					self.vel.x = -self.vel.x
+			if brickCollision then print('vector: '..responseVector:__tostring()) end
+
+			if brickCollision and responseVector then
+				if responseVector.y < 0 then
+					self.pos.y = brick.pos.y - self.rad
+					self.vel.y = math.abs(self.vel.y) * -1
+					self.collisionY = .1
+					brick.collisionEdge = 1
+				elseif responseVector.y > 0 then
+					self.pos.y = brick.pos.y + brick.h + self.rad
+					self.vel.y = math.abs(self.vel.y)
+					self.collisionY = .1
+					brick.collisionEdge = 3
+				elseif responseVector.x < 0 then
+					self.pos.x = brick.pos.x - self.rad
+					self.vel.x = math.abs(self.vel.x) * -1
+					self.collisionX = .1
+					brick.collisionEdge = 4
+				elseif responseVector.x > 0 then
+					self.pos.x = brick.pos.x + brick.w + self.rad
+					self.vel.x = math.abs(self.vel.x)
+					self.collisionX = .1
+					brick.collisionEdge = 2
 				end
+				return
 			end
 		end
 	end
@@ -147,7 +183,11 @@ end
 
 function Ball:getQuads()
 	return {
-		textured = love.graphics.newQuad(0, 0, 8, 8, self.textures:getWidth(), self.textures:getHeight())
+		textured = {
+			love.graphics.newQuad(0, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(10, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(20, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
+		},
 	}
 end
 

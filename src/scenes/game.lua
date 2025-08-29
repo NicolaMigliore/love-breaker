@@ -14,6 +14,8 @@ local Game = {
 	style = 'textured',
 }
 
+PAUSE = false
+
 function Game:enter()
 	love.graphics.setFont(FONTS.robotic)
 
@@ -22,17 +24,17 @@ function Game:enter()
 	self.isServing = true
 
 	-- setup entities
-	local pw = 70
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 30, pw, 7)
+	local pw, ph = 140, 14
+	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
 
 	self.balls = {}
-	local rad = 4
+	local rad = 10
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 
 	self.bricks = self:generateBricks()
 
-	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h, FIXED_WIDTH, 100, function(ball)
+	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + 5, FIXED_WIDTH, 100, function(ball)
 		local index = Lume.find(self.balls, ball)
 		if index then table.remove(self.balls, index) end
 		self.score = self.score - 20
@@ -49,6 +51,8 @@ function Game:enter()
 end
 
 function Game:update(dt)
+	if PAUSE then return end
+
 	-- update balls
 	for i, ball in ipairs(self.balls) do
 		ball:update(dt, self.paddle, self.bricks)
@@ -61,7 +65,7 @@ function Game:update(dt)
 
 		if INPUT:down('action1') then
 			self.isServing = false
-			nextBall.speed = 200
+			nextBall.speed = 300
 		end
 	end
 
@@ -86,10 +90,10 @@ function Game:update(dt)
 end
 
 function Game:draw()
-	Push:start()
+	-- Push:start()
 
-	love.graphics.setColor(.12, .14, .25)
-	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
+	-- love.graphics.setColor(.12, .14, .25)
+	-- love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -116,32 +120,32 @@ function Game:draw()
 
 	-- UI
 	love.graphics.setColor(0, 0, 0)
-	love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 20, FIXED_WIDTH, 20)
+	love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
 	love.graphics.setColor(1, 1, 1)
 
-	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 10, ALIGNMENTS.right)
+	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15, ALIGNMENTS.right)
 
-	Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 10, ALIGNMENTS.left)
+	Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
 
-	Push:finish()
+	-- Push:finish()
 end
 
 function Game:serveBall()
 	self.isServing = true
 
-	local rad = 4
+	local rad = 10
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 end
 
 function Game:generateBricks()
 	local bricks = {}
-	for row = 1, 6 do
-		local h = 12
-		local y = 10 + row * (h + 4)
+	for row = 0, 4 do
+		local h = 30
+		local y = 40 + row * (h + 8)
 		for i = 0, 6 do
-			local w = 40
-			local x = 26 + i * (w + 4)
+			local w = 80
+			local x = 52 + i * (w + 8)
 			local b = Brick(x, y, w, h)
 			table.insert(bricks, b)
 		end

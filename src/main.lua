@@ -1,4 +1,5 @@
 require 'globals'
+DEBUG = false
 local UIClass = require 'ui'
 local UI
 
@@ -37,6 +38,8 @@ end
 function love.update(dt)
 	UI:update(dt)
 	INPUT:update()
+
+	if INPUT:pressed('debug') then DEBUG = not DEBUG end
 end
 
 function love.draw()
