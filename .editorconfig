@@ -22,6 +22,15 @@ remove_table_field_list_finish_comma = false
 # enforce a space after commas
 space_after_comma = true
 
+# --- Alignment ---
+align_args = false
+align_parameter = false
+align_continuous_assign_statement = false
+
+# --- Ignore dist folder ---
+[dist/**.lua]
+disable = true
+
 # --- Misc safe defaults ---
 break_before_braces = false
 line_space_after_if_statement = keep

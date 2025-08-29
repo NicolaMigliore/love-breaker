@@ -7,6 +7,9 @@
     "Lua.diagnostics.globals": [
         "love", "Object", "Vecotr"
     ],
+    "Lua.workspace.ignoreDir": [
+        "dist"
+    ],
     "[lua]": {
         "editor.insertSpaces": false,
         "editor.detectIndentation": false,
@@ -19,5 +22,14 @@
         },
         "lineLength": 200,
         "callArgs": "chopdown"
+    },
+    "emmylua.spell.dict": [
+        "Utils"
+    ],
+     "files.exclude": {
+        "dist": true
+    },
+    "search.exclude": {
+        "dist": true
     }
 }
