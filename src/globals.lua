@@ -8,6 +8,7 @@ Inspect = require 'libs.inspect'
 Lume = require 'libs.lume'
 Push = require 'libs.push'
 Baton = require 'libs.baton'
+Flux = require 'libs.flux'
 Utils = require 'libs.utils'
 
 local initLuis = require 'luis.init'
