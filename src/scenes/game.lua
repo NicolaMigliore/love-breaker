@@ -8,7 +8,6 @@ local Game = {
 	balls = {},
 	paddle = nil,
 	bricks = {},
-	particles = nil,
 	gameOverTrigger = nil,
 	isServing = true,
 	score = 0,
@@ -20,6 +19,7 @@ PAUSE = false
 
 function Game:enter()
 	love.graphics.setFont(FONTS.robotic)
+	PARTICLES = Particles()
 
 	self.score = 0
 	self.lives = 3
@@ -50,8 +50,6 @@ function Game:enter()
 			end
 		end
 	end)
-
-	self.particles = Particles()
 end
 
 function Game:update(dt)
@@ -66,8 +64,8 @@ function Game:update(dt)
 				r1 = r1 + math.pi/2
 				r2 = r2 + math.pi/2
 			end
-			self.particles:addPuff(collisionPoint.x, collisionPoint.y, r1)
-			self.particles:addPuff(collisionPoint.x, collisionPoint.y, r2)
+			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r1)
+			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r2)
 		end
 	end
 
@@ -88,7 +86,7 @@ function Game:update(dt)
 	for i, brick in ipairs(self.bricks) do
 		if brick.collision and brick.breakTimer <= 0 then
 			local x, y = brick.pos.x + brick.w / 2, brick.pos.y + brick.h / 2
-			self.particles:addShatter(x, y, -math.pi / 2)
+			PARTICLES:addShatter(x, y, -math.pi / 2)
 			self.score = self.score + 10
 			if brick.lives <= 0 then
 				table.remove(self.bricks, i)
@@ -108,7 +106,7 @@ function Game:update(dt)
 		GameState.switch(GAME_SCENES.gameOver)
 	end
 
-	self.particles:update(dt)
+	PARTICLES:update(dt)
 end
 
 function Game:draw()
@@ -136,7 +134,7 @@ function Game:draw()
 	end
 
 	self.gameOverTrigger:draw()
-	self.particles:draw()
+	PARTICLES:draw()
 
 	-- UI
 	love.graphics.setColor(0, 0, 0)

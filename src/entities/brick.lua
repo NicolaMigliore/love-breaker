@@ -99,7 +99,7 @@ function Brick:collide(offset, bricks)
 		self.collision = false
 		for i, brick in ipairs(bricks) do
 			-- get bricks in range
-			local range = self.w + 10
+			local range = self.w + 15
 			local impactVector = self.pos - brick.pos
 			local dist = impactVector:len()
 			if brick ~= self and not brick.collision and dist <= range then
@@ -109,8 +109,8 @@ function Brick:collide(offset, bricks)
 					:oncomplete(function()
 						self.lives = self.lives - 1
 						self.collision = true
-						print('completing explosion')
 						brick:collide(impactVector:normalized(), bricks)
+						PARTICLES:addExplosion(self.pos.x + self.w / 2, self.pos.y + self.h / 2)
 					end)
 			end
 		end
