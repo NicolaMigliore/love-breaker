@@ -87,6 +87,8 @@ function Game:update(dt)
 	-- update bricks
 	for i, brick in ipairs(self.bricks) do
 		if brick.collision and brick.breakTimer and brick.breakTimer <= 0 then
+			local x, y = brick.pos.x + brick.w / 2, brick.pos.y + brick.h / 2
+			self.particles:addShatter(x, y, -math.pi / 2)
 			table.remove(self.bricks, i)
 			self.score = self.score + 10
 		else
