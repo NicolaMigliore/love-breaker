@@ -2,11 +2,13 @@ local Ball = require 'entities.ball'
 local Paddle = require 'entities.paddle'
 local Brick = require 'entities.brick'
 local TriggerRect = require 'entities.triggerRect'
+local Particles = require 'particles'
 
 local Game = {
 	balls = {},
 	paddle = nil,
 	bricks = {},
+	particles = nil,
 	gameOverTrigger = nil,
 	isServing = true,
 	score = 0,
@@ -28,7 +30,7 @@ function Game:enter()
 	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
 
 	self.balls = {}
-	local rad = 10
+	local rad = 15
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 
@@ -48,6 +50,8 @@ function Game:enter()
 			end
 		end
 	end)
+
+	self.particles = Particles()
 end
 
 function Game:update(dt)
@@ -55,7 +59,16 @@ function Game:update(dt)
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do
-		ball:update(dt, self.paddle, self.bricks)
+		local hasCollision, collisionPoint, collisionResponse = ball:update(dt, self.paddle, self.bricks)
+		if hasCollision then
+			local r1, r2 = 0, -math.pi
+			if math.abs(collisionResponse.x) > math.abs(collisionResponse.y) then
+				r1 = r1 + math.pi/2
+				r2 = r2 + math.pi/2
+			end
+			self.particles:addPuff(collisionPoint.x, collisionPoint.y, r1)
+			self.particles:addPuff(collisionPoint.x, collisionPoint.y, r2)
+		end
 	end
 
 	if self.isServing then
@@ -87,26 +100,25 @@ function Game:update(dt)
 		self.score = self.score + self.lives * 50
 		GameState.switch(GAME_SCENES.gameOver)
 	end
+
+	self.particles:update(dt)
 end
 
 function Game:draw()
 	-- Push:start()
 
-	-- love.graphics.setColor(.12, .14, .25)
-	-- love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
-
 	love.graphics.setColor(1, 1, 1, 1)
-
-	-- draw balls
-	for i, ball in ipairs(self.balls) do
-		ball:draw(self.style)
-	end
 
 	if self.isServing then
 		local nextBall = self.balls[#self.balls]
 		local p1 = nextBall.pos
-		local p2 = nextBall.pos + (nextBall.vel * 15)
+		local p2 = nextBall.pos + (nextBall.vel * 25)
 		love.graphics.line(p1.x, p1.y, p2.x, p2.y)
+	end
+
+	-- draw balls
+	for i, ball in ipairs(self.balls) do
+		ball:draw(self.style)
 	end
 
 	self.paddle:draw(self.style)
@@ -117,6 +129,7 @@ function Game:draw()
 	end
 
 	self.gameOverTrigger:draw()
+	self.particles:draw()
 
 	-- UI
 	love.graphics.setColor(0, 0, 0)
@@ -133,7 +146,7 @@ end
 function Game:serveBall()
 	self.isServing = true
 
-	local rad = 10
+	local rad = 15
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 end

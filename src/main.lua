@@ -43,6 +43,8 @@ function love.update(dt)
 end
 
 function love.draw()
+	love.graphics.setColor(.07, .07, .09)
+	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
 end
 
 function love.resize(w, h)
