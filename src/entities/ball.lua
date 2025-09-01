@@ -177,30 +177,32 @@ function Ball:brickCollision(bricks)
 				brick.h
 			)
 			self.collision = self.collision or brickCollision
-			brick.collision = brickCollision
 
 			if brickCollision and responseVector then
+				local collisionEdge = 0
 				if responseVector.y < 0 then
 					self.pos.y = brick.pos.y - self.rad
 					self.vel.y = math.abs(self.vel.y) * -1
 					self.collisionY = .1
-					brick.collisionEdge = 1
+					collisionEdge = 1
 				elseif responseVector.y > 0 then
 					self.pos.y = brick.pos.y + brick.h + self.rad
 					self.vel.y = math.abs(self.vel.y)
 					self.collisionY = .1
-					brick.collisionEdge = 3
+					collisionEdge = 3
 				elseif responseVector.x < 0 then
 					self.pos.x = brick.pos.x - self.rad
 					self.vel.x = math.abs(self.vel.x) * -1
 					self.collisionX = .1
-					brick.collisionEdge = 4
+					collisionEdge = 4
 				elseif responseVector.x > 0 then
 					self.pos.x = brick.pos.x + brick.w + self.rad
 					self.vel.x = math.abs(self.vel.x)
 					self.collisionX = .1
-					brick.collisionEdge = 2
+					collisionEdge = 2
 				end
+				brick:collide(collisionEdge, -responseVector)
+
 				return responseVector
 			end
 		end
