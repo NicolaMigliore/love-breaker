@@ -95,4 +95,27 @@ function Utils.printLabel(msg, x, y, align)
 	love.graphics.draw(text, x, y)
 end
 
+function Utils.drawDashedLine(x1, y1, x2, y2, dashLength, gapLength)
+	dashLength = dashLength or 10
+	gapLength = gapLength or 5
+	local dx = x2 - x1
+	local dy = y2 - y1
+	local totalLength = math.sqrt(dx * dx + dy * dy)
+
+	local numDashes = math.floor(totalLength / (dashLength + gapLength))
+
+	-- Normalize direction vector
+	local dirX = dx / totalLength
+	local dirY = dy / totalLength
+
+	for i = 0, numDashes do
+		local startX = x1 + dirX * (i * (dashLength + gapLength))
+		local startY = y1 + dirY * (i * (dashLength + gapLength))
+		local endX = startX + dirX * dashLength
+		local endY = startY + dirY * dashLength
+
+		love.graphics.line(startX, startY, endX, endY)
+	end
+end
+
 return Utils

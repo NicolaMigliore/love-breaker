@@ -1,6 +1,6 @@
 local Ball = require 'entities.ball'
 local Paddle = require 'entities.paddle'
-local Brick = require 'entities.brick'
+local Brick, BrickTypes = unpack(require 'entities.brick')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
 
@@ -13,7 +13,7 @@ local Game = {
 	isServing = true,
 	score = 0,
 	lives = 3,
-	style = 'textured',
+	style = STYLES.default,
 }
 
 PAUSE = false
@@ -89,8 +89,13 @@ function Game:update(dt)
 		if brick.collision and brick.breakTimer <= 0 then
 			local x, y = brick.pos.x + brick.w / 2, brick.pos.y + brick.h / 2
 			self.particles:addShatter(x, y, -math.pi / 2)
-			table.remove(self.bricks, i)
 			self.score = self.score + 10
+			if brick.lives <= 0 then
+				table.remove(self.bricks, i)
+			else
+				-- reset collision state for hard bricks
+				brick.collision = false
+			end
 		else
 			brick:update(dt)
 		end
@@ -155,14 +160,31 @@ end
 
 function Game:generateBricks()
 	local bricks = {}
-	for row = 0, 4 do
-		local h = 30
-		local y = 40 + row * (h + 8)
-		for i = 0, 6 do
-			local w = 80
-			local x = 52 + i * (w + 8)
-			local b = Brick(x, y, w, h)
-			table.insert(bricks, b)
+	local level = {
+		'bxxxxxb',
+		'bbbhbbb',
+		'hhhhhhh',
+		'eheeehe',
+	}
+
+	for j, row in ipairs(level) do
+		local h = 40
+		local y = 40 + (j - 1) * (h + 14)
+		for i = 1, #row do
+			local b = string.sub(row, i, i)
+			local choices = {
+				b = 'base',
+				h = 'hard',
+				e = 'explosive',
+				x = 'empty',
+			}
+			local brickType = BrickTypes[choices[b]]
+			if brickType then
+				local w = 80
+				local x = 38 + (i - 1) * (w + 14)
+				local newBrick = Brick(x, y, w, h, brickType)
+				table.insert(bricks, newBrick)
+			end
 		end
 	end
 	return bricks
