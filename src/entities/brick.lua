@@ -119,25 +119,28 @@ function Brick:collide(offset, bricks)
 	Flux.to(self.offset, .5 + love.math.random(), { x = 0, y = 0 }):ease("elasticout")
 
 	if self.type == BrickTypes.explosive then
-		self.lives = self.lives + 1
+		print('hit explosive. collision: '..tostring(self.collision)..' lives: '..self.lives)
+		self.lives = 1
 		self.collision = false
-		for i, brick in ipairs(bricks) do
-			-- get bricks in range
-			local range = self.w + 15
-			local impactVector = self.pos - brick.pos
-			local dist = impactVector:len()
-			if brick ~= self and not brick.collision and dist <= range then
-				-- collide bricks
-				Flux.to(self, .5, { scale = 1.2 })
-					:ease('elasticin')
-					:oncomplete(function()
-						self.lives = self.lives - 1
-						self.collision = true
+
+
+		Flux.to(self, .5, { scale = 1.2 })
+			:ease('elasticin')
+			:oncomplete(function()
+				self.lives = self.lives - 1
+				self.collision = true
+				PARTICLES:addExplosion(self.pos.x + self.w / 2, self.pos.y + self.h / 2)
+				-- break other bricks
+				for i, brick in ipairs(bricks) do
+					-- get bricks in range
+					local range = self.w + 15
+					local impactVector = self.pos - brick.pos
+					local dist = impactVector:len()
+					if brick ~= self and not brick.collision and dist <= range then
 						brick:collide(impactVector:normalized(), bricks)
-						PARTICLES:addExplosion(self.pos.x + self.w / 2, self.pos.y + self.h / 2)
-					end)
-			end
-		end
+					end
+				end
+			end)
 	elseif self.type == BrickTypes.drop then
 		-- spawn new drop entity
 		Drop(self.pos.x, self.pos.y)
