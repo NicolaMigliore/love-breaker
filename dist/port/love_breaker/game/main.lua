@@ -1,4 +1,5 @@
 require 'globals'
+DEBUG = false
 local UIClass = require 'ui'
 local UI
 
@@ -35,11 +36,17 @@ function love.load()
 end
 
 function love.update(dt)
+	Timer.update(dt)
+	Flux.update(dt)
 	UI:update(dt)
 	INPUT:update()
+
+	if INPUT:pressed('debug') then DEBUG = not DEBUG end
 end
 
 function love.draw()
+	love.graphics.setColor(.07, .07, .09)
+	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
 end
 
 function love.resize(w, h)
