@@ -4,6 +4,14 @@ local Brick, BrickTypes = unpack(require 'entities.brick')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
 
+local levels = {
+	{ 'b' }
+	-- {'bbbbbbb','bbbbbbb','bbbbbbb','bbbbbbb','bbbbbbb'},
+	-- {'bbbbbbb','xxxxxxx','bbbbbbb','xxxxxxx','bbbbbbb'},
+	-- {'bbbbbbb','xxxxxxx','bbbbbbb','xxxxxxx','bbbbbbb'},
+	-- {'bxxxxxb','bbbhbbb','hhhhhhh','eheeehe','bbbbbbb'},
+}
+
 local Game = {
 	balls = {},
 	paddle = nil,
@@ -13,6 +21,7 @@ local Game = {
 	score = 0,
 	lives = 3,
 	style = STYLES.default,
+	curLevel = 1
 }
 
 PAUSE = false
@@ -23,33 +32,9 @@ function Game:enter()
 
 	self.score = 0
 	self.lives = 3
-	self.isServing = true
+	self.curLevel = 1
 
-	-- setup entities
-	local pw, ph = 140, 14
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
-
-	self.balls = {}
-	local rad = 15
-	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
-	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
-
-	self.bricks = self:generateBricks()
-
-	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + 5, FIXED_WIDTH, 100, function(ball)
-		local index = Lume.find(self.balls, ball)
-		if index then table.remove(self.balls, index) end
-		self.score = self.score - 20
-		if #self.balls == 0 then
-			self.lives = self.lives - 1
-
-			if self.lives <= 0 then
-				GameState.switch(GAME_SCENES.gameOver)
-			else
-				self:serveBall()
-			end
-		end
-	end)
+	self:setLevel(self.curLevel)
 end
 
 function Game:update(dt)
@@ -96,6 +81,15 @@ function Game:update(dt)
 			end
 		else
 			brick:update(dt)
+		end
+	end
+	if #self.bricks == 0 then
+		-- TODO: add transition
+		self.curLevel = self.curLevel + 1
+		if self.curLevel <= #levels then
+			self:setLevel(self.curLevel)
+		else
+			GameState.switch(GAME_SCENES.gameOver)
 		end
 	end
 
@@ -156,14 +150,44 @@ function Game:serveBall()
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 end
 
-function Game:generateBricks()
+--- setup the level
+---@param lvl number level number
+function Game:setLevel(lvl)
+	self.isServing = true
+
+	-- setup entities
+	local pw, ph = 140, 14
+	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
+
+	self.balls = {}
+	local rad = 15
+	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
+	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
+
+
+	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + 5, FIXED_WIDTH, 100, function(ball)
+		local index = Lume.find(self.balls, ball)
+		if index then table.remove(self.balls, index) end
+		self.score = self.score - 20
+		if #self.balls == 0 then
+			self.lives = self.lives - 1
+
+			if self.lives <= 0 then
+				GameState.switch(GAME_SCENES.gameOver)
+			else
+				self:serveBall()
+			end
+		end
+	end)
+
+	self.bricks = self:generateBricks(levels[lvl])
+end
+
+--- generate the bricks for the provided level
+---@param level table list of strings describing brick rows
+---@return table bricks list of the bricks to add to the level
+function Game:generateBricks(level)
 	local bricks = {}
-	local level = {
-		'bxxxxxb',
-		'bbbhbbb',
-		'hhhhhhh',
-		'eheeehe',
-	}
 
 	for j, row in ipairs(level) do
 		local h = 40
