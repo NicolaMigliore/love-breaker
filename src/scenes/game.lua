@@ -65,6 +65,7 @@ function Game:update(dt)
 		if INPUT:down('action1') then
 			self.isServing = false
 			nextBall.speed = self.ballSpeed
+			nextBall.served = true
 		end
 	end
 
@@ -118,11 +119,13 @@ function Game:update(dt)
 				b1.vel.x = math.abs(b1.vel.x) * signX
 				b1.vel.y = math.abs(b1.vel.y) * signY
 				b1.speed = self.ballSpeed
+				b1.served = true
 				table.insert(self.balls, b1)
 				local b2 = Ball(lastBall.pos.x - self.ballRad * 2 - 15, lastBall.pos.y, self.ballRad)
 				b2.vel.x = math.abs(b2.vel.x) * signX
 				b2.vel.y = math.abs(b2.vel.y) * signY
 				b2.speed = self.ballSpeed
+				b2.served = true
 				table.insert(self.balls, b2)
 			end
 
@@ -196,6 +199,7 @@ end
 --- setup the level
 ---@param lvl number level number
 function Game:setLevel(lvl)
+	PARTICLES = Particles()
 	self.isServing = true
 
 	-- setup entities
@@ -209,7 +213,12 @@ function Game:setLevel(lvl)
 
 	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + self.ballRad * 2, FIXED_WIDTH, 100,
 		function(ball, index)
-			if index then table.remove(self.balls, index) end
+			if index then
+				local particleIndex = Lume.find(PARTICLES.list, ball.trail)
+				print(particleIndex)
+				table.remove(PARTICLES.list, particleIndex)
+				table.remove(self.balls, index)
+			end
 			self.score = self.score - 20
 			if #self.balls == 0 then
 				self.lives = self.lives - 1

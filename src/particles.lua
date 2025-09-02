@@ -24,7 +24,8 @@ end
 function Particles:update(dt)
 	for i,p in ipairs(self.list) do
 		p:update(dt)
-		if p:getCount() == 0 then
+		local lifeTime = p:getEmitterLifetime( )
+		if p:getCount() == 0 and lifeTime > -1 then
 			table.remove(self.list,i)
 			i = i - 1
 		end
@@ -54,7 +55,7 @@ function Particles:addPuff(x, y, r)
 	ps:setDirection(r)
 	ps:setEmissionArea("none", 0, 0, 0, false)
 	ps:setEmissionRate(0)
-	ps:setEmitterLifetime(-1)
+	ps:setEmitterLifetime(0.03)
 	ps:setInsertMode("top")
 	ps:setLinearAcceleration(0, 0, 0, 0)
 	ps:setLinearDamping(11.27397441864, 20)
@@ -156,6 +157,37 @@ function Particles:addExplosion(x, y)
 	ps:setPosition(x, y)
 	ps:emit(5)
 	table.insert(self.list, ps)
+end
+
+function Particles:addTrail(x, y, r)
+	r = r or math.pi / 2
+	local ps = love.graphics.newParticleSystem(self.shatterImg, 1050)
+	ps:setColors(0.98000001907349, 0.76309335231781, 0.16660000383854, 1, 0.98000001907349, 0.41944000124931, 0.11760000139475, 1, 0.68000000715256, 0.13600000739098, 0.20853333175182, 1, 0.68000000715256, 0.13600000739098, 0.20853333175182, 0.25)
+	ps:setDirection(r)
+	-- ps:setEmissionArea("none", 0, 0, 0, false)
+	ps:setEmissionArea("normal", 2.5, 2.5, 0, false)
+	ps:setEmissionRate(25)
+	ps:setEmitterLifetime(-1)
+	ps:setInsertMode("top")
+	ps:setLinearAcceleration(0, 0, 0, 0)
+	ps:setLinearDamping(0, 0)
+	ps:setOffset(50, 50)
+	ps:setParticleLifetime(0.2, 0.8)
+	ps:setRadialAcceleration(0, 0)
+	ps:setRelativeRotation(false)
+	ps:setRotation(0, 0)
+	ps:setSizes(0.090000003576279, 0.029999999329448)
+	ps:setSizeVariation(0.25)
+	ps:setSpeed(50, 75)
+	ps:setSpin(0, 0)
+	ps:setSpinVariation(0)
+	ps:setSpread(0.31415927410126)
+	ps:setTangentialAcceleration(0, 0)
+	ps:setPosition(x, y)
+	-- ps:emit(16)
+	table.insert(self.list, ps)
+
+	return ps
 end
 
 return Particles

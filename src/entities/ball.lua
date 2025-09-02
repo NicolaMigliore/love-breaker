@@ -12,8 +12,10 @@ function Ball:new(x, y, r)
 	self.collisionY = 0
 	self.textures = love.graphics.newImage('assets/textures/ball.png')
 	self.quads = self:getQuads()
+	self.served = false
 
 	-- -- TODO: implement advanced trails (https://love2d.org/forums/viewtopic.php?p=247592#p247592)
+	self.trail = nil
 	-- self.trail = {}
 	-- self.trailMax = 128
 end
@@ -27,12 +29,20 @@ end
 ---@return Vector position current position of the ball
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
 function Ball:update(dt, paddle, bricks)
-	-- table.insert(self.trail, self.pos)
-	-- if #self.trail > self.trailMax then table.remove(self.trail, 1) end
-
 	local normVelocity = self.vel:normalized()
-	self.pos = self.pos + normVelocity * self.speed * dt
 
+	-- update trail particleSystem
+	if self.trail == nil and self.served then
+		self.trail = PARTICLES:addTrail(self.pos.x, self.pos.y)
+	elseif self.trail then
+		local trailPos = self.pos - normVelocity * 10
+		self.trail:setPosition(trailPos.x, trailPos.y)
+		local cur_angle = Utils.round(math.atan2(self.vel.y, self.vel.x), 4)
+		-- print(Inspect(cur_angle))
+		self.trail:setDirection(cur_angle - math.pi)
+	end
+
+	self.pos = self.pos + normVelocity * self.speed * dt
 	if self.collisionX > 0 then self.collisionX = self.collisionX - dt end
 	if self.collisionY > 0 then self.collisionY = self.collisionY - dt end
 	self.collision = false
