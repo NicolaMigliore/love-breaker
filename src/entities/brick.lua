@@ -38,14 +38,21 @@ function Brick:draw(style)
 
 	local x, y = self.pos.x + self.offset.x, self.pos.y + self.offset.y
 	local w, h = self.w, self.h
+	local styleQuads = self.quads[style]
 
 	if DEBUG then love.graphics.rectangle('line', x, y, w, h) end
 
 	if style == STYLES.basic then
 		love.graphics.rectangle('fill', x, y, w, h)
-	elseif style == STYLES.textured then
-		local quadW, quadH, quad = self.quads[style].w, self.quads[style].h, self.quads[style].quad
+	elseif style == STYLES.textured or style == STYLES.neon then
+		if self.collision then love.graphics.setColor(.6, .2, .5) end
+		local quadW, quadH, quad = styleQuads.w, styleQuads.h, styleQuads[self.type]
 		local scaleX, scaleY = w / quadW, h / quadH
+		-- override texture for hard bricks that have been hit
+		if self.type == BrickTypes.hard and self.lives == 1 then
+			quad = styleQuads.base
+		end
+
 		love.graphics.draw(self.textures, quad, x, y, 0, scaleX, scaleY)
 	else
 		if self.lives > 1 then love.graphics.setColor(.3, .2, .5) end
@@ -69,7 +76,8 @@ function Brick:draw(style)
 end
 
 function Brick:getQuads()
-	local w, h = 40, 20
+	local w, h = 40, 13
+	local textureWidth, textureHeight = self.textures:getWidth(), self.textures:getHeight()
 
 	local basicBrick = love.graphics.newCanvas(w, h)
 	love.graphics.setCanvas(basicBrick)
@@ -80,12 +88,26 @@ function Brick:getQuads()
 		basic = {
 			w = w,
 			h = h,
-			quad = basicBrick,
+			base = basicBrick,
+			hard = basicBrick,
+			explosive = basicBrick,
+			drop = basicBrick,
 		},
 		textured = {
 			w = w,
 			h = h,
-			quad = love.graphics.newQuad(0, 0, w, h, self.textures:getWidth(), self.textures:getHeight()),
+			base = love.graphics.newQuad(0, 0, w, h, textureWidth, textureHeight),
+			hard = love.graphics.newQuad(40, 0, w, h, textureWidth, textureHeight),
+			explosive = love.graphics.newQuad(80, 0, w, h, textureWidth, textureHeight),
+			drop = love.graphics.newQuad(120, 0, w, h, textureWidth, textureHeight),
+		},
+		neon = {
+			w = w,
+			h = h,
+			base = love.graphics.newQuad(0, 13, w, h, textureWidth, textureHeight),
+			hard = love.graphics.newQuad(40, 13, w, h, textureWidth, textureHeight),
+			explosive = love.graphics.newQuad(80, 13, w, h, textureWidth, textureHeight),
+			drop = love.graphics.newQuad(120, 13, w, h, textureWidth, textureHeight),
 		}
 	}
 end

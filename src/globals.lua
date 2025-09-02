@@ -46,6 +46,7 @@ STYLES = {
 	default = 'default',
 	basic = 'basic',
 	textured = 'textured',
+	neon = 'neon',
 }
 
 -- Game states

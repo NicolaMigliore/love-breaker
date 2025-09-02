@@ -30,7 +30,7 @@ end
 
 function Paddle:draw(style)
 	love.graphics.setColor(1, 1, 1, 1)
-	if style == STYLES.textured then
+	if style == STYLES.textured or style == STYLES.neon then
 		local quadW, quadH, quad = self.quads[style].w, self.quads[style].h, self.quads[style].quad
 		local scaleX, scaleY = self.w / quadW, self.h / quadH
 		love.graphics.draw(self.textures, quad, self.pos.x, self.pos.y, 0, scaleX, scaleY)
@@ -49,6 +49,11 @@ function Paddle:getQuads()
 			w = w,
 			h = h,
 			quad = love.graphics.newQuad(0, 0, w, h, self.textures:getWidth(), self.textures:getHeight()),
+		},
+		neon = {
+			w = w,
+			h = h,
+			quad = love.graphics.newQuad(0, 7, w, h, self.textures:getWidth(), self.textures:getHeight()),
 		}
 	}
 end

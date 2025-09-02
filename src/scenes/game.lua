@@ -18,7 +18,7 @@ local Game = {
 	isServing = true,
 	score = 0,
 	lives = 3,
-	style = STYLES.default,
+	style = STYLES.neon,
 	curLevel = 1,
 }
 
@@ -235,7 +235,7 @@ function Game:generateBricks(level)
 	local bricks = {}
 
 	for j, row in ipairs(level) do
-		local h = 25
+		local h = 26
 		local y = 55 + (j - 1) * (h + 14)
 		for i = 1, #row do
 			local b = string.sub(row, i, i)
@@ -248,8 +248,8 @@ function Game:generateBricks(level)
 			}
 			local brickType = BrickTypes[choices[b]]
 			if brickType then
-				local w = 78
-				local x = 50 + (i - 1) * (w + 14)
+				local w = 80
+				local x = 43 + (i - 1) * (w + 14)
 				local newBrick = Brick(x, y, w, h, brickType)
 				table.insert(bricks, newBrick)
 			end

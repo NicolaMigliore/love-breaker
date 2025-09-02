@@ -63,8 +63,10 @@ function Ball:draw(style)
 
 	if style == STYLES.basic then
 		love.graphics.rectangle('fill', (self.pos.x - self.rad), (self.pos.y - self.rad), (self.rad * 2), (self.rad * 2))
-	elseif style == STYLES.textured then
-		local quadSize, quadIndex = 10, 1
+	elseif style == STYLES.textured or style == STYLES.neon then
+		if self.collisionY > 0 or self.collisionX > 0 then love.graphics.setColor(.6, .6, .6) end
+		-- if self.collisionY > 0 or self.collisionX > 0 then love.graphics.setColor(1,1,1) end
+		local quadSize, quadIndex = 12, 1
 		if self.collisionY > 0 then quadIndex = 2 end
 		if self.collisionX > 0 then quadIndex = 3 end
 		local quad = self.quads[style][quadIndex]
@@ -75,6 +77,10 @@ function Ball:draw(style)
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
 		love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
 	end
+
+	-- love.graphics.setColor(1, 0, 0)
+	-- love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
+	
 	love.graphics.setColor(1, 1, 1)
 end
 
@@ -208,9 +214,14 @@ end
 function Ball:getQuads()
 	return {
 		textured = {
-			love.graphics.newQuad(0, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(10, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(20, 0, 10, 10, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(0, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(12, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(24, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+		},
+		neon = {
+			love.graphics.newQuad(0, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(12, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(24, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
 		},
 	}
 end
