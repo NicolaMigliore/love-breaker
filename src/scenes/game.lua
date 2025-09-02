@@ -4,13 +4,7 @@ local Brick, BrickTypes = unpack(require 'entities.brick')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
 
-local levels = {
-	{ 'b' }
-	-- {'bbbbbbb','bbbbbbb','bbbbbbb','bbbbbbb','bbbbbbb'},
-	-- {'bbbbbbb','xxxxxxx','bbbbbbb','xxxxxxx','bbbbbbb'},
-	-- {'bbbbbbb','xxxxxxx','bbbbbbb','xxxxxxx','bbbbbbb'},
-	-- {'bxxxxxb','bbbhbbb','hhhhhhh','eheeehe','bbbbbbb'},
-}
+local levels = require('assets.level-sets.base')
 
 local Game = {
 	balls = {},
@@ -21,7 +15,8 @@ local Game = {
 	score = 0,
 	lives = 3,
 	style = STYLES.default,
-	curLevel = 1
+	curLevel = 1,
+	ballSpeed = 400,
 }
 
 PAUSE = false
@@ -61,7 +56,7 @@ function Game:update(dt)
 
 		if INPUT:down('action1') then
 			self.isServing = false
-			nextBall.speed = 300
+			nextBall.speed = self.ballSpeed
 		end
 	end
 
@@ -165,7 +160,7 @@ function Game:setLevel(lvl)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
 
 
-	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + 5, FIXED_WIDTH, 100, function(ball)
+	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + rad*2, FIXED_WIDTH, 100, function(ball)
 		local index = Lume.find(self.balls, ball)
 		if index then table.remove(self.balls, index) end
 		self.score = self.score - 20
@@ -190,8 +185,8 @@ function Game:generateBricks(level)
 	local bricks = {}
 
 	for j, row in ipairs(level) do
-		local h = 40
-		local y = 40 + (j - 1) * (h + 14)
+		local h = 25
+		local y = 55 + (j - 1) * (h + 14)
 		for i = 1, #row do
 			local b = string.sub(row, i, i)
 			local choices = {
@@ -202,8 +197,8 @@ function Game:generateBricks(level)
 			}
 			local brickType = BrickTypes[choices[b]]
 			if brickType then
-				local w = 80
-				local x = 38 + (i - 1) * (w + 14)
+				local w = 78
+				local x = 50 + (i - 1) * (w + 14)
 				local newBrick = Brick(x, y, w, h, brickType)
 				table.insert(bricks, newBrick)
 			end
