@@ -2,6 +2,7 @@
 Camera = require 'libs.hump.camera'
 GameState = require 'libs.hump.gamestate'
 Vector = require 'libs.hump.vector'
+Timer = require 'libs.hump.timer'
 Object = require 'libs.classic'
 Husl = require 'libs.husl'
 Inspect = require 'libs.inspect'

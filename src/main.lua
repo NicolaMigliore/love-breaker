@@ -36,6 +36,7 @@ function love.load()
 end
 
 function love.update(dt)
+	Timer.update(dt)
 	Flux.update(dt)
 	UI:update(dt)
 	INPUT:update()

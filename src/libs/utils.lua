@@ -80,6 +80,27 @@ function Utils.collisionCircRect(cx, cy, cr, rx, ry, rw, rh)
 	return hasCollision, response
 end
 
+--- Check if a two rectangles are colliding
+---@param r1x number rectangle 1 x coordinate
+---@param r1y number rectangle 1 y coordinate
+---@param r1w number rectangle 1 width
+---@param r1h number rectangle 1 height
+---@param r2x number rectangle 2 x coordinate
+---@param r2y number rectangle 2 y coordinate
+---@param r2w number rectangle 2 width
+---@param r2h number rectangle 2 height
+---@return boolean hasCollision true if the rectangles are colliding
+function Utils.CollisionRectRect(r1x, r1y, r1w, r1h, r2x, r2y, r2w, r2h)
+	local r1BelowR2 = r1y > r2y + r2h
+	local r1AboveR2 = r1y + r1h < r2y
+	local r1RightOfR2 = r1x > r2x + r2w
+	local r1LeftOfR2 = r1x + r1w < r2x
+	if r1BelowR2 or r1AboveR2 or r1RightOfR2 or r1LeftOfR2 then
+		return false
+	end
+	return true
+end
+
 function Utils.printLabel(msg, x, y, align)
 	align = align or ALIGNMENTS.left
 	local font = love.graphics.getFont()

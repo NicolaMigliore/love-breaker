@@ -1,3 +1,4 @@
+local Drop = unpack(require 'entities.drop')
 local Brick = Object:extend()
 
 local BrickTypes = {
@@ -49,6 +50,7 @@ function Brick:draw(style)
 	else
 		if self.lives > 1 then love.graphics.setColor(.3, .2, .5) end
 		if self.type == BrickTypes.explosive then love.graphics.setColor(.5, .2, .3) end
+		if self.type == BrickTypes.drop then love.graphics.setColor(.4, .6, .3) end
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
 		
 		local rectOx, rectOy = self.w / 2, self.h / 2
@@ -114,6 +116,9 @@ function Brick:collide(offset, bricks)
 					end)
 			end
 		end
+	elseif self.type == BrickTypes.drop then
+		-- spawn new drop entity
+		Drop(self.pos.x, self.pos.y)
 	end
 end
 

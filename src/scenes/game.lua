@@ -1,6 +1,7 @@
 local Ball = require 'entities.ball'
 local Paddle = require 'entities.paddle'
 local Brick, BrickTypes = unpack(require 'entities.brick')
+local Drop, DropTypes = unpack(require 'entities.drop')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
 
@@ -8,7 +9,10 @@ local levels = require('assets.level-sets.base')
 
 local Game = {
 	balls = {},
+	ballRad = 10,
+	ballSpeed = 400,
 	paddle = nil,
+	paddleSpeed = 600,
 	bricks = {},
 	gameOverTrigger = nil,
 	isServing = true,
@@ -16,7 +20,6 @@ local Game = {
 	lives = 3,
 	style = STYLES.default,
 	curLevel = 1,
-	ballSpeed = 400,
 }
 
 PAUSE = false
@@ -24,25 +27,30 @@ PAUSE = false
 function Game:enter()
 	love.graphics.setFont(FONTS.robotic)
 	PARTICLES = Particles()
+	DROPS = {}
 
 	self.score = 0
 	self.lives = 3
 	self.curLevel = 1
+	-- self.ballRad = 15
 
 	self:setLevel(self.curLevel)
 end
 
+-- MARK: Update
 function Game:update(dt)
 	if PAUSE then return end
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do
+		ball.rad = self.ballRad
+		ball.speed = self.ballSpeed
 		local hasCollision, collisionPoint, collisionResponse = ball:update(dt, self.paddle, self.bricks)
 		if hasCollision then
 			local r1, r2 = 0, -math.pi
 			if math.abs(collisionResponse.x) > math.abs(collisionResponse.y) then
-				r1 = r1 + math.pi/2
-				r2 = r2 + math.pi/2
+				r1 = r1 + math.pi / 2
+				r2 = r2 + math.pi / 2
 			end
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r1)
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r2)
@@ -60,6 +68,7 @@ function Game:update(dt)
 		end
 	end
 
+	self.paddle.speed = self.paddleSpeed
 	self.paddle:update(dt)
 
 	-- update bricks
@@ -88,8 +97,41 @@ function Game:update(dt)
 		end
 	end
 
+	for i, drop in ipairs(DROPS) do
+		drop:update(dt)
+
+		-- check paddle collision
+		local paddleCollide = Utils.CollisionRectRect(drop.pos.x, drop.pos.y, drop.w, drop.h, self.paddle.pos.x, self.paddle.pos.y, self.paddle.w, self.paddle.h)
+		if paddleCollide then
+			if drop.type == DropTypes.life then
+				self.lives = self.lives + 1
+			elseif drop.type == DropTypes.bigBall then
+				self.ballRad = 10
+				Timer.after(10, function() self.ballRad = 15 end)
+			elseif drop.type == DropTypes.speedPaddle then
+				self.paddleSpeed = 800
+				Timer.after(10, function() self.paddleSpeed = 600 end)
+			elseif drop.type == DropTypes.multiBall then
+				local lastBall = self.balls[#self.balls]
+				local signX, signY = Utils.sign(lastBall.vel.x), Utils.sign(lastBall.vel.y)
+				local b1 = Ball(lastBall.pos.x + self.ballRad * 2 + 15, lastBall.pos.y, self.ballRad)
+				b1.vel.x = math.abs(b1.vel.x) * signX
+				b1.vel.y = math.abs(b1.vel.y) * signY
+				b1.speed = self.ballSpeed
+				table.insert(self.balls, b1)
+				local b2 = Ball(lastBall.pos.x - self.ballRad * 2 - 15, lastBall.pos.y, self.ballRad)
+				b2.vel.x = math.abs(b2.vel.x) * signX
+				b2.vel.y = math.abs(b2.vel.y) * signY
+				b2.speed = self.ballSpeed
+				table.insert(self.balls, b2)
+			end
+
+			table.remove(DROPS, i)
+		end
+	end
+
 	-- update trigger
-	self.gameOverTrigger:update(dt, self.balls)
+	self.gameOverTrigger:update(dt, self.balls, DROPS)
 	if #self.bricks == 0 then
 		self.score = self.score + self.lives * 50
 		GameState.switch(GAME_SCENES.gameOver)
@@ -98,6 +140,7 @@ function Game:update(dt)
 	PARTICLES:update(dt)
 end
 
+-- MARK: Draw
 function Game:draw()
 	-- Push:start()
 
@@ -122,6 +165,10 @@ function Game:draw()
 		brick:draw(self.style)
 	end
 
+	for i, drop in ipairs(DROPS) do
+		drop:draw()
+	end
+
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
 
@@ -130,7 +177,8 @@ function Game:draw()
 	love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
 	love.graphics.setColor(1, 1, 1)
 
-	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15, ALIGNMENTS.right)
+	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15,
+		ALIGNMENTS.right)
 
 	Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
 
@@ -140,11 +188,11 @@ end
 function Game:serveBall()
 	self.isServing = true
 
-	local rad = 15
-	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
-	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
+	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)
+	table.insert(self.balls, Ball(nextPos.x, nextPos.y, self.ballRad))
 end
 
+-- MARK: Setup Level
 --- setup the level
 ---@param lvl number level number
 function Game:setLevel(lvl)
@@ -155,25 +203,27 @@ function Game:setLevel(lvl)
 	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
 
 	self.balls = {}
-	local rad = 15
-	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - rad - 1)
-	table.insert(self.balls, Ball(nextPos.x, nextPos.y, rad))
+	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)
+	table.insert(self.balls, Ball(nextPos.x, nextPos.y, self.ballRad))
 
 
-	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + rad*2, FIXED_WIDTH, 100, function(ball)
-		local index = Lume.find(self.balls, ball)
-		if index then table.remove(self.balls, index) end
-		self.score = self.score - 20
-		if #self.balls == 0 then
-			self.lives = self.lives - 1
+	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + self.ballRad * 2, FIXED_WIDTH, 100,
+		function(ball, index)
+			if index then table.remove(self.balls, index) end
+			self.score = self.score - 20
+			if #self.balls == 0 then
+				self.lives = self.lives - 1
 
-			if self.lives <= 0 then
-				GameState.switch(GAME_SCENES.gameOver)
-			else
-				self:serveBall()
+				if self.lives <= 0 then
+					GameState.switch(GAME_SCENES.gameOver)
+				else
+					self:serveBall()
+				end
 			end
-		end
-	end)
+		end,
+		function(drop, index)
+			table.remove(DROPS, index)
+		end)
 
 	self.bricks = self:generateBricks(levels[lvl])
 end
@@ -194,6 +244,7 @@ function Game:generateBricks(level)
 				h = 'hard',
 				e = 'explosive',
 				x = 'empty',
+				d = 'drop'
 			}
 			local brickType = BrickTypes[choices[b]]
 			if brickType then
