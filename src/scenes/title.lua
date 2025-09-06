@@ -7,25 +7,36 @@ function Title:enter(prev)
 	self.layers.main = Luis.newLayer('main')
 	Luis.setCurrentLayer('main')
 
-	local b_start = Luis.createElement('main', 'Button', 'START PLAYING', 8, 2, nil, function() GameState.switch(GAME_SCENES.game) end, 1, 1)
-	local b_test = Luis.createElement('main', 'Button', 'TEST', 8, 2, nil, function() print 'pressed' end, 1, 1)
+	local decorator = THEMES.basic.decorator
 
-	local c_main = Luis.createElement('main', 'Container', 10, 7, 10, 16, false, false, nil, nil)
-	c_main:addChild(b_start, 2, 2)
-	c_main:addChild(b_test, 5, 2)
+	local maxCol = UI:getMaxCol()
+	local cw, ch = 24, 22
+	local c_main = UI:newContainer('main', cw, ch, 8, (maxCol / 2) - (cw / 2) + 1, decorator, 'mainContainer')
+
+	local lw, lh = cw - 2, 3
+	local lCol = (cw / 2) - (lw / 2) + 1
+	local customTheme = {
+		color = { 1, 1, 1, 1 },
+		font = FONTS.robotic_l,
+		align = 'center',
+	}
+	-- local l_title = Luis.createElement('main', 'Label', 'PAUSE', lw, lh, 1, 1, 'center')
+	local l_title = UI:newLabel('main', 'LOVE-BREAKER', lw, lh, ALIGNMENTS.center, customTheme)
+	c_main:addChild(l_title, 2, lCol)
+
+	local bw, bh = 8, 2
+	local bCol = (cw / 2) - (bw / 2) + 1
+	local b_start = UI:newButton('main', 'START', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game) end)
+	c_main:addChild(b_start, 8, bCol)
+	local b_test = UI:newButton('main', 'TEST', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game) end)
+	c_main:addChild(b_test, 11, bCol)
 end
 
 function Title:update(dt)
-	TIME = TIME + dt
-	if TIME >= 1 / 60 then
-		Luis.flux.update(TIME)
-		TIME = 0
-	end
-	Luis.update(dt)
+
 end
 
 function Title:draw()
-	Luis:draw()
 end
 
 function Title:leave()

@@ -22,8 +22,6 @@ local Game = {
 	curLevel = 1,
 }
 
-PAUSE = false
-
 function Game:enter()
 	love.graphics.setFont(FONTS.robotic)
 	PARTICLES = Particles()
@@ -39,7 +37,7 @@ end
 
 -- MARK: Update
 function Game:update(dt)
-	if PAUSE then return end
+	if INPUT:released('start') then GameState.push(GAME_SCENES.pause) return end
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do

@@ -119,7 +119,6 @@ function Brick:collide(offset, bricks)
 	Flux.to(self.offset, .5 + love.math.random(), { x = 0, y = 0 }):ease("elasticout")
 
 	if self.type == BrickTypes.explosive then
-		print('hit explosive. collision: '..tostring(self.collision)..' lives: '..self.lives)
 		self.lives = 1
 		self.collision = false
 

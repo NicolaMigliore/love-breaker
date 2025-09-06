@@ -1,7 +1,7 @@
 require 'globals'
 DEBUG = false
 local UIClass = require 'ui'
-local UI
+UI = nil
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
@@ -28,6 +28,7 @@ function love.load()
 			down = { 'key:down', 'key:s', 'axis:lefty+', 'button:dpdown' },
 			action1 = { 'key:space', 'button:a' },
 			reload = { 'key:r', 'button:y' },
+			start = { 'key:escape', 'key:insert', 'button:start' },
 			debug = { 'key:tab' },
 		},
 		pairs = {},
@@ -47,6 +48,8 @@ end
 function love.draw()
 	love.graphics.setColor(.07, .07, .09)
 	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
+
+	UI:draw()
 end
 
 function love.resize(w, h)

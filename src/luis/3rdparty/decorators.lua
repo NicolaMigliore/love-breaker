@@ -101,6 +101,81 @@ end
 
 decorators.Slice9Decorator = Slice9Decorator
 
+-- Slice-9 Decorator
+local CustomSlice9Decorator = setmetatable({}, { __index = BaseDecorator })
+CustomSlice9Decorator.__index = CustomSlice9Decorator
+
+function CustomSlice9Decorator.new(widget, image, left, right, top, bottom, hoveImage)
+	local self = setmetatable(BaseDecorator.new(widget), CustomSlice9Decorator)
+	self.image = image
+	self.left = left
+	self.right = right
+	self.top = top
+	self.bottom = bottom
+	self.hoveImage = hoveImage
+	self.hoverColor = { 1, 1, 1, 1 }
+	return self
+end
+
+function CustomSlice9Decorator:draw(this)
+	love.graphics.setColor(1,1,1,1)
+	local x, y = self.widget.position.x, self.widget.position.y
+	local w, h = self.widget.width, self.widget.height
+	local left, right, top, bottom = self.left, self.right, self.top, self.bottom
+	local image = self.image
+	local iw, ih = image:getDimensions()
+
+	-- set color based on state
+	if this.hover or this.focused then
+		image = self.hoveImage
+		w = w + Luis.gridSize
+		x = x - .5 * Luis.gridSize
+		love.graphics.setColor(unpack(self.hoverColor))
+	end
+
+	-- Center width and height
+	local cw = iw - left - right
+	local ch = ih - top - bottom
+
+	-- Draw corners
+	love.graphics.draw(image, love.graphics.newQuad(0, 0, left, top, iw, ih), x, y)
+	love.graphics.draw(image, love.graphics.newQuad(iw - right, 0, right, top, iw, ih),
+		x + w - right, y)
+	love.graphics.draw(image, love.graphics.newQuad(0, ih - bottom, left, bottom, iw, ih), x,
+		y + h - bottom)
+	love.graphics.draw(image,
+		love.graphics.newQuad(iw - right, ih - bottom, right, bottom, iw, ih), x + w - right,
+		y + h - bottom)
+
+	-- Draw edges
+	love.graphics.draw(image, love.graphics.newQuad(left, 0, cw, top, iw, ih), x + left, y, 0,
+		(w - left - right) / cw, 1)
+	love.graphics.draw(image, love.graphics.newQuad(left, ih - bottom, cw, bottom, iw, ih),
+		x + left, y + h - bottom, 0, (w - left - right) / cw, 1)
+	love.graphics.draw(image, love.graphics.newQuad(0, top, left, ch, iw, ih), x, y + top, 0, 1,
+		(h - top - bottom) / ch)
+	love.graphics.draw(image, love.graphics.newQuad(iw - right, top, right, ch, iw, ih),
+		x + w - right, y + top, 0, 1, (h - top - bottom) / ch)
+
+	-- Draw center
+	love.graphics.draw(image, love.graphics.newQuad(left, top, cw, ch, iw, ih), x + left,
+		y + top, 0, (w - left - right) / cw, (h - top - bottom) / ch)
+
+	-- Draw text
+	if this.text then
+		love.graphics.setColor(this.theme.textColor)
+		love.graphics.setFont(Luis.theme.text.font)
+		love.graphics.printf(this.text, this.position.x, this.position.y + (this.height - Luis.theme.text.font:getHeight()) / 2, this.width, this.theme.align)
+	end
+
+	-- Call the base draw method (which calls the widget's defaultDraw)
+	--BaseDecorator.draw(self)
+
+	love.graphics.setColor(1, 1, 1, 1)
+end
+
+decorators.CustomSlice9Decorator = CustomSlice9Decorator
+
 -- Glassmorphism Decorator
 local GlassmorphismDecorator = setmetatable({}, {__index = BaseDecorator})
 GlassmorphismDecorator.__index = GlassmorphismDecorator

@@ -42,6 +42,16 @@ ALIGNMENTS = {
 	center = 'center',
 }
 
+PALETTE = {
+	black = Utils.hexToRGB('3e3546'),
+	grey = Utils.hexToRGB('625565'),
+	white = Utils.hexToRGB('c7dcd0'),
+}
+
+THEMES = {
+	basic = require 'assets.themes.basic'
+}
+
 STYLES = {
 	default = 'default',
 	basic = 'basic',
@@ -54,6 +64,7 @@ GAME_SCENES = {
 	title = require 'scenes.title',
 	game = require 'scenes.game',
 	gameOver = require 'scenes.gameOver',
+	pause = require 'scenes.pause',
 }
 
 TIME = 0

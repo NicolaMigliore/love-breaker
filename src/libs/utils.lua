@@ -139,4 +139,14 @@ function Utils.drawDashedLine(x1, y1, x2, y2, dashLength, gapLength)
 	end
 end
 
+-- Convert hex to RGB (0-1 range)
+function Utils.hexToRGB(hex)
+	return {
+		tonumber(hex:sub(1, 2), 16) / 255,
+		tonumber(hex:sub(3, 4), 16) / 255,
+		tonumber(hex:sub(5, 6), 16) / 255,
+		1 -- Alpha is always 1 here
+	}
+end
+
 return Utils
