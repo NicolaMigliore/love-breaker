@@ -88,8 +88,9 @@ function UI:newContainer(layerName, w, h, row, col, decorator, containerName)
 	return container
 end
 
-function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease)
-	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onRelease, 1, 1, nil)
+function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, customTheme)
+	local theme = customTheme or THEMES.basic.button
+	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onRelease, 1, 1, theme)
 	if btn and decorator then
 		btn:setDecorator(
 			'CustomSlice9Decorator',

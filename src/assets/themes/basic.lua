@@ -12,8 +12,9 @@ local basicTheme = {
 	},
 	button = {
 		color = PALETTE.grey,
-		hoverColor = PALETTE.black,
-		-- pressedColor = { PALETTE.orange[1] * 0.8, PALETTE.orange[2] * 0.8, PALETTE.orange[3] * 0.8, 1 },
+		hoverColor = PALETTE.orange_2,
+		borderColor = PALETTE.white,
+		pressedColor = { PALETTE.orange_2[1] * 0.8, PALETTE.orange_2[2] * 0.8, PALETTE.orange_2[3] * 0.8, 1 },
 		textColor = PALETTE.white,
 		align = "center",
 		cornerRadius = 4,
@@ -74,7 +75,7 @@ local basicTheme = {
 	},
 	flexContainer = {
 		backgroundColor = { 0.2, 0.2, 0.2, 0.5 },
-		borderColor = { 0.3, 0.3, 0.3, 1 },
+		borderColor = PALETTE.white,
 		borderWidth = 2,
 		padding = 0,
 		handleSize = 20,

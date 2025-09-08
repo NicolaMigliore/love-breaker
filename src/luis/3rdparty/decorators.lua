@@ -113,29 +113,37 @@ function CustomSlice9Decorator.new(widget, image, left, right, top, bottom, hove
 	self.top = top
 	self.bottom = bottom
 	self.hoveImage = hoveImage
-	self.hoverColor = { 1, 1, 1, 1 }
 	return self
 end
 
 function CustomSlice9Decorator:draw(this)
-	love.graphics.setColor(1,1,1,1)
 	local x, y = self.widget.position.x, self.widget.position.y
 	local w, h = self.widget.width, self.widget.height
 	local left, right, top, bottom = self.left, self.right, self.top, self.bottom
 	local image = self.image
 	local iw, ih = image:getDimensions()
 
-	-- set color based on state
+	-- set custom colors
+	local defaultColor = { 1, 1, 1, 1 }
+	local textColor = this.theme.textColor or defaultColor
+	local borderColor = this.theme.borderColor or defaultColor
+
+	-- override values based on state
 	if this.hover or this.focused then
 		image = self.hoveImage
 		w = w + Luis.gridSize
 		x = x - .5 * Luis.gridSize
-		love.graphics.setColor(unpack(self.hoverColor))
+		if(this.theme.hoverColor) then
+			textColor = this.theme.hoverColor
+			borderColor = this.theme.hoverColor
+		end
 	end
 
 	-- Center width and height
 	local cw = iw - left - right
 	local ch = ih - top - bottom
+
+	love.graphics.setColor(borderColor)
 
 	-- Draw corners
 	love.graphics.draw(image, love.graphics.newQuad(0, 0, left, top, iw, ih), x, y)
@@ -163,7 +171,7 @@ function CustomSlice9Decorator:draw(this)
 
 	-- Draw text
 	if this.text then
-		love.graphics.setColor(this.theme.textColor)
+		love.graphics.setColor(textColor)
 		love.graphics.setFont(Luis.theme.text.font)
 		love.graphics.printf(this.text, this.position.x, this.position.y + (this.height - Luis.theme.text.font:getHeight()) / 2, this.width, this.theme.align)
 	end

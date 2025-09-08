@@ -46,6 +46,9 @@ PALETTE = {
 	black = Utils.hexToRGB('3e3546'),
 	grey = Utils.hexToRGB('625565'),
 	white = Utils.hexToRGB('c7dcd0'),
+	orange_1 = Utils.hexToRGB('f79617'),
+	orange_2 = Utils.hexToRGB('f79617'),
+	orange_3 = Utils.hexToRGB('fb6b1d'),
 }
 
 THEMES = {
