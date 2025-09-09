@@ -1,6 +1,4 @@
 local levels = {
-	{ 'ebeeebe','hhhhhhh','xxbbbxx','hhhhhhh','ebeeebe' },
-	
 	{ 'bbbbbbb','bbbbbbb','bbbbbbb' },
 	{ 'bbbbbbb','hhhhhhh','bbbbbbb' },
 	{ 'bbbbbbb','bxxbxxb','bxxbxxb','bxxbxxb','bbbbbbb', 'xxbbbxx' },

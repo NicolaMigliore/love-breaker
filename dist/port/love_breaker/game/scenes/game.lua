@@ -1,7 +1,7 @@
 local Ball = require 'entities.ball'
 local Paddle = require 'entities.paddle'
 local Brick, BrickTypes = unpack(require 'entities.brick')
-local Drop, DropTypes = unpack(require 'entities.drop')
+local Drop, DropTypes, DropTypeColors = unpack(require 'entities.drop')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
 
@@ -20,26 +20,54 @@ local Game = {
 	lives = 3,
 	style = STYLES.neon,
 	curLevel = 1,
+	isEndless = false,
+	layers = {},
+	timers = {},
 }
 
-PAUSE = false
-
-function Game:enter()
-	love.graphics.setFont(FONTS.robotic)
+function Game:enter(previous, endless)
 	PARTICLES = Particles()
 	DROPS = {}
 
 	self.score = 0
 	self.lives = 3
+	
+	self.isEndless = endless
 	self.curLevel = 1
-	-- self.ballRad = 15
-
 	self:setLevel(self.curLevel)
+
+	-- setup UI
+	if UI:layerExists('hud') then
+		UI:removeLayer('hud')
+	end
+	local hudLayer = UI:newLayer('hud')
+	local maxCol = UI:getMaxCol()
+	local maxRow = UI:getMaxRow()
+
+	local containerTheme = Lume.clone(UI:getTheme().container)
+	containerTheme.backgroundColor = PALETTE.orange_2
+	containerTheme.borderColor = PALETTE.orange_2
+	local c_hud = UI:newContainer('hud', maxCol, 2, maxRow - 1, 1, nil, containerTheme, 'hudContainer')
+
+	local labelTheme = Lume.clone(UI:getTheme().text)
+	labelTheme.color = PALETTE.black
+	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_lives, 1, maxCol - 17)
+	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_score, 1, maxCol - 8)
+
+	self.layers.hud = {
+		layerName = 'hud',
+		layer = hudLayer,
+		containers = {
+			c_hud = c_hud
+		}
+	}
 end
 
 -- MARK: Update
 function Game:update(dt)
-	if PAUSE then return end
+	if INPUT:released('start') then GameState.push(GAME_SCENES.pause) return end
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do
@@ -107,9 +135,11 @@ function Game:update(dt)
 			if drop.type == DropTypes.life then
 				self.lives = self.lives + 1
 			elseif drop.type == DropTypes.bigBall then
-				self.ballRad = 10
-				Timer.after(10, function() self.ballRad = 15 end)
+				if self.timers.bigBall then Timer.cancel(self.timers.bigBall) self.timers.bigBall = nil end
+				self.ballRad = 20
+				self.timers.bigBall = Timer.after(10, function() self.ballRad = 10 end)
 			elseif drop.type == DropTypes.speedPaddle then
+				if self.timers.paddleSpeed then Timer.cancel(self.timers.paddleSpeed) self.timers.paddleSpeed = nil end
 				self.paddleSpeed = 800
 				Timer.after(10, function() self.paddleSpeed = 600 end)
 			elseif drop.type == DropTypes.multiBall then
@@ -129,6 +159,11 @@ function Game:update(dt)
 				table.insert(self.balls, b2)
 			end
 
+			local typeColor = DropTypeColors[drop.type]
+			local colors = { typeColor[1], typeColor[2], typeColor[3], 1, 0.331298828125, 0.33332443237305, 0.4609375, 1, 0.72265625, 0.72265625, 0.72265625, 0.3984375}
+			local px = self.paddle.pos.x + self.paddle.w / 2 + love.math.random(10) - 5
+			local py = drop.pos.y + drop.h + love.math.random(8) - 4
+			PARTICLES:addBigPuff(px, py, nil, colors)
 			table.remove(DROPS, i)
 		end
 	end
@@ -141,6 +176,12 @@ function Game:update(dt)
 	end
 
 	PARTICLES:update(dt)
+
+	-- update hud
+	local hudContainer = self.layers.hud.containers.c_hud
+	local labels = hudContainer.children
+	labels[1]:setText('LIVES '..self.lives)
+	labels[2]:setText('SCORE '..self.score)
 end
 
 -- MARK: Draw
@@ -169,23 +210,27 @@ function Game:draw()
 	end
 
 	for i, drop in ipairs(DROPS) do
-		drop:draw()
+		drop:draw(self.style)
 	end
 
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
 
 	-- UI
-	love.graphics.setColor(0, 0, 0)
-	love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
-	love.graphics.setColor(1, 1, 1)
+	-- love.graphics.setColor(0, 0, 0)
+	-- love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
+	-- love.graphics.setColor(1, 1, 1)
 
-	Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15,
-		ALIGNMENTS.right)
+	-- Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15,
+	-- 	ALIGNMENTS.right)
 
-	Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
+	-- Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
 
 	-- Push:finish()
+end
+
+function Game:leave()
+	UI:removeLayer('hud')
 end
 
 function Game:serveBall()
@@ -234,7 +279,11 @@ function Game:setLevel(lvl)
 			table.remove(DROPS, index)
 		end)
 
-	self.bricks = self:generateBricks(levels[lvl])
+	if self.isEndless then
+		self.bricks = self:generateRandomBricks()
+	else
+		self.bricks = self:generateBricks(levels[lvl])
+	end
 end
 
 --- generate the bricks for the provided level
@@ -265,6 +314,35 @@ function Game:generateBricks(level)
 		end
 	end
 	return bricks
+end
+
+function Game:generateRandomBricks()
+	local rows = {
+		'bbbbbbb',
+		'bbxxxbb',
+		'bbbpbbb',
+		'pbbpbbp',
+		'hhhhhhh',
+		'hbhbhbh',
+		'xxxxxxx',
+		'bbxxxbb',
+		'bpxxxpb',
+		'hbxxxhb',
+		'xhbbbhx',
+		'xxeeexx',
+		'eeeeeee',
+		'heheheh',
+		'xheeehx',
+		'hphhhph',
+		'xxbbbxx',
+		'bpbpbpb',
+	}
+	local noLines = 3 + math.floor(love.math.random(4))
+	local level = {}
+	for i = 1, noLines do
+		table.insert(level, Utils.rndTablePick(rows))
+	end
+	return self:generateBricks(level)
 end
 
 return Game

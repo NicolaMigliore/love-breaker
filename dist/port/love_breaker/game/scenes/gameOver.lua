@@ -1,14 +1,16 @@
 local GameOver = {
     score = 0,
+	isEndless = false,
     buttons = {},
 }
 
 function GameOver:enter(previous)
     self.score = previous.score
+	self.isEndless = previous.isEndless
 end
 
 function GameOver:update(dt)
-    if INPUT:down('reload')then GameState.switch(GAME_SCENES.game) end
+    if INPUT:down('reload') then GameState.switch(GAME_SCENES.game, self.isEndless) end
 end
 
 function GameOver:draw()
