@@ -91,6 +91,10 @@ function UI:popLayer()
 	Luis.popLayer()
 end
 
+function UI:layerExists(layerName)
+	return Luis.layerExists(layerName)
+end
+
 --- Create new container
 ---@param layerName string
 ---@param w number

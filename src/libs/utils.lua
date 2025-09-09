@@ -149,4 +149,11 @@ function Utils.hexToRGB(hex)
 	}
 end
 
+--- Return a random value from the table list
+---@param tb any the table value
+function Utils.rndTablePick(tb)
+	local i = math.floor(love.math.random(#tb)) + 1
+	return tb[i]
+end
+
 return Utils

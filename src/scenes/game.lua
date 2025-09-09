@@ -25,18 +25,21 @@ local Game = {
 	timers = {},
 }
 
-function Game:enter()
+function Game:enter(previous, endless)
 	PARTICLES = Particles()
 	DROPS = {}
 
 	self.score = 0
 	self.lives = 3
 	
-	-- self.isEndless = endless
+	self.isEndless = endless
 	self.curLevel = 1
 	self:setLevel(self.curLevel)
 
 	-- setup UI
+	if UI:layerExists('hud') then
+		UI:removeLayer('hud')
+	end
 	local hudLayer = UI:newLayer('hud')
 	local maxCol = UI:getMaxCol()
 	local maxRow = UI:getMaxRow()
@@ -48,10 +51,10 @@ function Game:enter()
 
 	local labelTheme = Lume.clone(UI:getTheme().text)
 	labelTheme.color = PALETTE.black
-	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 7, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_lives, 1, maxCol - 14)
-	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 7, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_score, 1, maxCol - 7)
+	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_lives, 1, maxCol - 17)
+	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_score, 1, maxCol - 8)
 
 	self.layers.hud = {
 		layerName = 'hud',
@@ -276,7 +279,11 @@ function Game:setLevel(lvl)
 			table.remove(DROPS, index)
 		end)
 
-	self.bricks = self:generateBricks(levels[lvl])
+	if self.isEndless then
+		self.bricks = self:generateRandomBricks()
+	else
+		self.bricks = self:generateBricks(levels[lvl])
+	end
 end
 
 --- generate the bricks for the provided level
@@ -307,6 +314,35 @@ function Game:generateBricks(level)
 		end
 	end
 	return bricks
+end
+
+function Game:generateRandomBricks()
+	local rows = {
+		'bbbbbbb',
+		'bbxxxbb',
+		'bbbpbbb',
+		'pbbpbbp',
+		'hhhhhhh',
+		'hbhbhbh',
+		'xxxxxxx',
+		'bbxxxbb',
+		'bpxxxpb',
+		'hbxxxhb',
+		'xhbbbhx',
+		'xxeeexx',
+		'eeeeeee',
+		'heheheh',
+		'xheeehx',
+		'hphhhph',
+		'xxbbbxx',
+		'bpbpbpb',
+	}
+	local noLines = 3 + math.floor(love.math.random(4))
+	local level = {}
+	for i = 1, noLines do
+		table.insert(level, Utils.rndTablePick(rows))
+	end
+	return self:generateBricks(level)
 end
 
 return Game

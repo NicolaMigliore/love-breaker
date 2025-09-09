@@ -2,7 +2,7 @@ local Title = {
 	layers = {}
 }
 
-function Title:enter(prev)
+function Title:enter()
 	-- UI - create main layer
 	self.layers.main = UI:newLayer('main')
 
@@ -25,10 +25,10 @@ function Title:enter(prev)
 
 	local bw, bh = 8, 2
 	local bCol = (cw / 2) - (bw / 2) + 1
-	local b_start = UI:newButton('main', 'START', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game) end)
+	local b_start = UI:newButton('main', 'CLASSIC', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, false) end)
 	c_main:addChild(b_start, 8, bCol)
-	local b_test = UI:newButton('main', 'TEST', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game) end)
-	c_main:addChild(b_test, 11, bCol)
+	local b_start = UI:newButton('main', 'ENDLESS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, true) end)
+	c_main:addChild(b_start, 11, bCol)
 end
 
 function Title:update(dt)
