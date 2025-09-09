@@ -63,6 +63,34 @@ function UI:getMaxRow()
 	return math.floor(screenH / gridCellSize)
 end
 
+--- get the currently applied theme
+function UI:getTheme()
+	return Luis.theme
+end
+
+--- Create new layer
+---@param layerName string name of the new layer
+---@param setCurrent boolean weather the layer should be set as currently active
+---@return any then new layer
+function UI:newLayer(layerName, setCurrent)
+	setCurrent = setCurrent or true
+	local layer = Luis.newLayer(layerName)
+	if setCurrent then Luis.setCurrentLayer(layerName) end
+	return layer
+end
+
+--- Disable and remove the provided layer
+---@param layerName string the name of the layer to remove
+function UI:removeLayer(layerName)
+	Luis.disableLayer(layerName)
+	Luis.removeLayer(layerName)
+end
+
+--- Pops the current layer from the layer stack and disables it making the new top layer in the stack active.
+function UI:popLayer()
+	Luis.popLayer()
+end
+
 --- Create new container
 ---@param layerName string
 ---@param w number
@@ -72,8 +100,8 @@ end
 ---@param decorator any decorator configuration to apply
 ---@param containerName string
 ---@return any container the new container
-function UI:newContainer(layerName, w, h, row, col, decorator, containerName)
-	local container = Luis.createElement(layerName, 'Container', w, h, row, col, false, false, nil, containerName)
+function UI:newContainer(layerName, w, h, row, col, decorator, customTheme, containerName)
+	local container = Luis.createElement(layerName, 'Container', w, h, row, col, false, false, customTheme, containerName)
 	container.focusable = false
 	if container and decorator then
 		container:setDecorator(

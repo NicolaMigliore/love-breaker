@@ -28,7 +28,7 @@ function Pause:getContainer()
 	
 	local maxRow, maxCol = UI:getMaxRow(), UI:getMaxCol()
 	local cw, ch = 20, 25
-	local c_main = UI:newContainer('main', cw, ch, (maxRow / 2) - (ch / 2) + 1, (maxCol / 2) - (cw / 2) + 1, decorator, 'mainContainer')
+	local c_main = UI:newContainer('main', cw, ch, (maxRow / 2) - (ch / 2) + 1, (maxCol / 2) - (cw / 2) + 1, decorator, nil, 'mainContainer')
 
 	local lw, lh = cw - 2, 3
 	local lCol = (cw / 2) - (lw / 2) + 1
@@ -49,8 +49,8 @@ function Pause:getContainer()
 end
 
 function Pause:leave()
-	Luis.disableLayer('main')
-	Luis.removeLayer('main')
+	UI:popLayer()
+	UI:removeLayer('main')
 end
 
 return Pause

@@ -29,7 +29,7 @@ function label.new(value, width, height, row, col, align, customTheme)
         
         defaultDraw = function(self)
             local textTheme = applyThemeToText(self.theme or luis)
-            love.graphics.printf(self.value, self.position.x, self.position.y + (self.height - textTheme.font:getHeight()) / 2, self.width, align or textTheme.align)
+            love.graphics.printf(self.value, self.position.x, self.position.y + (self.height - textTheme.font:getHeight()) / 2 + 3, self.width, align or textTheme.align)
         end,
 
 		-- Draw method that can use a decorator

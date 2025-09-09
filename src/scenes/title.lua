@@ -4,14 +4,13 @@ local Title = {
 
 function Title:enter(prev)
 	-- UI - create main layer
-	self.layers.main = Luis.newLayer('main')
-	Luis.setCurrentLayer('main')
+	self.layers.main = UI:newLayer('main')
 
 	local decorator = THEMES.basic.decorator
 
 	local maxCol = UI:getMaxCol()
 	local cw, ch = 24, 22
-	local c_main = UI:newContainer('main', cw, ch, 8, (maxCol / 2) - (cw / 2) + 1, decorator, 'mainContainer')
+	local c_main = UI:newContainer('main', cw, ch, 8, (maxCol / 2) - (cw / 2) + 1, decorator, nil, 'mainContainer')
 
 	local lw, lh = cw - 2, 3
 	local lCol = (cw / 2) - (lw / 2) + 1
@@ -40,8 +39,7 @@ function Title:draw()
 end
 
 function Title:leave()
-	Luis.disableLayer('main')
-	Luis.removeLayer('main')
+	UI:removeLayer('main')
 end
 
 return Title

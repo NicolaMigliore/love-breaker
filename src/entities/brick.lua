@@ -41,10 +41,7 @@ function Brick:draw(style)
 	local styleQuads = self.quads[style]
 
 	if DEBUG then love.graphics.rectangle('line', x, y, w, h) end
-
-	if style == STYLES.basic then
-		love.graphics.rectangle('fill', x, y, w, h)
-	elseif style == STYLES.textured or style == STYLES.neon then
+	if style == STYLES.textured or style == STYLES.neon then
 		if self.collision then love.graphics.setColor(.6, .2, .5) end
 		local quadW, quadH, quad = styleQuads.w, styleQuads.h, styleQuads[self.type]
 		local scaleX, scaleY = w / quadW, h / quadH
@@ -61,17 +58,12 @@ function Brick:draw(style)
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
 		
 		local rectOx, rectOy = self.w / 2, self.h / 2
-		local quadW, quadH, quad = self.quads.basic.w, self.quads.basic.h, self.quads.basic.quad
+		local quadW, quadH, quad = self.quads.basic.w, self.quads.basic.h, self.quads.basic[self.type]
 		local quadOx, quadOy = quadW / 2, quadH / 2
 		local scaleX, scaleY = w / quadW * self.scale, h / quadH * self.scale
 		local angle = 0
 
-		
 		love.graphics.draw(quad, x + rectOx, y + rectOy, angle, scaleX, scaleY, quadOx, quadOy)
-		
-		-- love.graphics.setColor(1, 0, 0)
-		-- love.graphics.rectangle('line', self.pos.x, self.pos.y, self.w, self.h)
-		-- love.graphics.circle('fill', self.pos.x + rectOx, self.pos.y + rectOy, 5)
 	end
 end
 

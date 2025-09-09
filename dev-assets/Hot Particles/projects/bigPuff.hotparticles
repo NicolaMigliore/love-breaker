@@ -1,0 +1,88 @@
+7
+
+:project
+bgColor 0 0 0.15
+bgChecker 0
+bgSize 8
+bgPath 0 !
+bgScale 1
+bgRepeat false false
+pixelateWorld true
+pixelateTextures true
+exportBaseDirectory 0 !
+exportParticles true
+exportParticlesOverwrite false
+exportParticlesTemplate 16 defaultLuaModule!
+exportParticlesTemplatePath 0 !
+exportParticlesPath 0 !
+exportTextures false
+exportTexturesOverwrite false
+exportTexturesDirectory 0 !
+exportClipboardTemplate 19 defaultLuaClipboard!
+exportClipboardTemplatePath 0 !
+scaleGlobalTimeEnabled true
+scaleGlobalTime 1
+scaleGlobalSpaceEnabled true
+scaleGlobalSpace 1
+scaleGlobalSizeEnabled true
+scaleGlobalSize 1
+zoom 1
+customData 0 !
+emitterPosition 0 0
+movementScaleEnabled true true
+movement 0 1 1 1
+region true 0 0
+
+:system
+blendMode 5 alpha!
+colors 0 0.17578125 0.26953125 1 0.6640625 0.28125 0.4609375 1 0 0 0.72265625 0.3984375
+customData 0 !
+directionEnabled true
+direction -1.5707963267949
+emissionRate 500
+emitterContinuous false
+emitterLifetime 0.03
+emitterOffsetEnabled true
+emitterOffset 0 0
+insertMode 3 top!
+kickStartEmitEnabled true
+kickStartEmit 0
+kickStartStepsEnabled true
+kickStartSteps 0
+linearDampingEnabled true
+linearDamping 11.27397442048 20
+offset 0.5 0.5
+particleLifetime 0.3 0.8
+radialAccelerationEnabled true
+radialAcceleration 0 1024
+relativeRotation false
+rotationEnabled true
+rotation 0 0
+scaleSizeEnabled true
+scaleSize 1
+scaleSpaceEnabled true
+scaleSpace 1
+scaleTimeEnabled true
+scaleTime 1
+shaderPath 0 !
+sizes 0.25 1.25
+sizeVariationEnabled true
+sizeVariation 0.75079872204473
+speedEnabled true
+speed 25.007910665619 91.641233451398
+spinEnabled true true
+spin 0 0
+spinVariationEnabled true
+spinVariation 0
+spreadEnabled true
+spread 3.1415926535898
+tangentialAccelerationEnabled true
+tangentialAcceleration 0 0
+texture 6 circle!
+texturePath 0 !
+title 0 !
+emissionAreaAngleEnabled true
+emissionAreaDeltaEnabled true true
+emissionArea 4 none! 100 100 0 false
+linearAccelerationEnabled true true
+linearAcceleration 0 0 0 0

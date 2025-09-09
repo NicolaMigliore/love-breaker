@@ -137,6 +137,14 @@ luis.theme = {
         handleSize = 20,
         handleColor = {0.5, 0.5, 0.5, 1}
 	},
+	container = {
+        backgroundColor = {0.2, 0.2, 0.2, 0.5},
+        borderColor = {0.3, 0.3, 0.3, 1},
+        borderWidth = 2,
+        padding = 0,
+        handleSize = 20,
+        handleColor = {0.5, 0.5, 0.5, 1}
+	},
 	node = {
 		textColor = {1,1,1},
 		backgroundColor = {0.1, 0.1, 0.1},
