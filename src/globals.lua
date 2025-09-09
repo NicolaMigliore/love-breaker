@@ -43,12 +43,21 @@ ALIGNMENTS = {
 }
 
 PALETTE = {
-	black = Utils.hexToRGB('3e3546'),
+	black = { .07, .07, .09, 1 },
 	grey = Utils.hexToRGB('625565'),
 	white = Utils.hexToRGB('c7dcd0'),
-	orange_1 = Utils.hexToRGB('f79617'),
+	orange_1 = Utils.hexToRGB('f9c22b'),
 	orange_2 = Utils.hexToRGB('f79617'),
 	orange_3 = Utils.hexToRGB('fb6b1d'),
+	red_1 = Utils.hexToRGB('f04f78'),
+	red_2 = Utils.hexToRGB('c32454'),
+	red_3 = Utils.hexToRGB('831c5d'),
+	green_1 = Utils.hexToRGB('8ff8e2'),
+	green_2 = Utils.hexToRGB('30e1b9'),
+	green_3 = Utils.hexToRGB('0b8a8f'),
+	blue_1 = Utils.hexToRGB('8fd3ff'),
+	blue_2 = Utils.hexToRGB('4d9be6'),
+	blue_3 = Utils.hexToRGB('4d65b4'),
 }
 
 THEMES = {
