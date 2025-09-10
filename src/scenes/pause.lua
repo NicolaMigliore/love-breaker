@@ -44,6 +44,8 @@ function Pause:getContainer()
 	
 	local b_title = UI:newButton('main', 'QUIT', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.title) end)
 	c_main:addChild(b_title, 11, bCol)
+
+	UI:animateContainer(c_main, .2)
 end
 
 function Pause:leave()

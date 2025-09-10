@@ -237,12 +237,14 @@ function Container.new(width, height, row, col, isDraggable, isResizable, custom
 
 			-- Draw container background
 			love.graphics.setColor(containerTheme.backgroundColor)
-			love.graphics.rectangle("fill", self.position.x, self.position.y, self.width, self.height, containerTheme.cornerRadius)
+			love.graphics.rectangle("fill", self.position.x, self.position.y, self.width, self.height,
+				containerTheme.cornerRadius)
 
 			-- Draw container border
 			love.graphics.setColor(containerTheme.borderColor)
 			love.graphics.setLineWidth(containerTheme.borderWidth)
-			love.graphics.rectangle("line", self.position.x, self.position.y, self.width, self.height, containerTheme.cornerRadius)
+			love.graphics.rectangle("line", self.position.x, self.position.y, self.width, self.height,
+				containerTheme.cornerRadius)
 
 			-- Draw resize handle
 			if self.isResizable then
@@ -425,11 +427,17 @@ function Container.new(width, height, row, col, isDraggable, isResizable, custom
 		-- Hide the container and all children
 		hide = function(self)
 			self.visible = false
+			for i, child in ipairs(self.children) do
+				child.visible = false
+			end
 		end,
 
 		-- Show the container and all children
 		show = function(self)
 			self.visible = true
+			for i, child in ipairs(self.children) do
+				child.visible = true
+			end
 		end,
 
 		-- Toggle visibility

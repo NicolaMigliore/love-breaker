@@ -8,7 +8,20 @@ function GameOver:enter(previous)
 	self.score = previous.score
 	self.isEndless = previous.isEndless
 
+	Timer.after(.2, function() self:createUI() end)
+end
 
+function GameOver:update(dt)
+end
+
+function GameOver:draw()
+end
+
+function GameOver:leave()
+	UI:removeLayer('main')
+end
+
+function GameOver:createUI()
 	self.layers.main = UI:newLayer('main')
 	
 	local decorator = THEMES.basic.decorator
@@ -35,16 +48,7 @@ function GameOver:enter(previous)
 	local b_quit = UI:newButton('main', 'QUIT', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.title) end)
 	c_main:addChild(b_quit, 14, bCol)
 
-end
-
-function GameOver:update(dt)
-end
-
-function GameOver:draw()
-end
-
-function GameOver:leave()
-	UI:removeLayer('main')
+	UI:animateContainer(c_main, .2)
 end
 
 return GameOver

@@ -3,6 +3,21 @@ local Title = {
 }
 
 function Title:enter()
+	Timer.after(.2, function() self:createUI() end)
+end
+
+function Title:update(dt)
+
+end
+
+function Title:draw()
+end
+
+function Title:leave()
+	UI:removeLayer('main')
+end
+
+function Title:createUI()
 	-- UI - create main layer
 	self.layers.main = UI:newLayer('main')
 
@@ -10,7 +25,8 @@ function Title:enter()
 
 	local maxCol = UI:getMaxCol()
 	local cw, ch = 24, 22
-	local c_main = UI:newContainer('main', cw, ch, 8, (maxCol / 2) - (cw / 2) + 1, decorator, nil, 'mainContainer')
+	local cCol = (maxCol / 2) - (cw / 2) + 1
+	local c_main = UI:newContainer('main', cw, ch, 8, cCol, decorator, nil, 'mainContainer')
 
 	local lw, lh = cw - 2, 3
 	local lCol = (cw / 2) - (lw / 2) + 1
@@ -28,17 +44,8 @@ function Title:enter()
 	c_main:addChild(b_start, 8, bCol)
 	local b_start = UI:newButton('main', 'ENDLESS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, true) end)
 	c_main:addChild(b_start, 11, bCol)
-end
 
-function Title:update(dt)
-
-end
-
-function Title:draw()
-end
-
-function Title:leave()
-	UI:removeLayer('main')
+	UI:animateContainer(c_main, .2)
 end
 
 return Title

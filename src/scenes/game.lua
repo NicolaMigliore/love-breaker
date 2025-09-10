@@ -231,6 +231,7 @@ end
 
 function Game:leave()
 	UI:removeLayer('hud')
+	print('leaving game')
 end
 
 function Game:serveBall()

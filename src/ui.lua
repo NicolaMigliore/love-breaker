@@ -63,6 +63,10 @@ function UI:getMaxRow()
 	return math.floor(screenH / gridCellSize)
 end
 
+function UI:getGridSize()
+	return Luis.getGridSize()
+end
+
 --- get the currently applied theme
 function UI:getTheme()
 	return Luis.theme
@@ -118,6 +122,22 @@ function UI:newContainer(layerName, w, h, row, col, decorator, customTheme, cont
 		)
 	end
 	return container
+end
+
+function UI:animateContainer(container, time)
+	local targetW, targetH, targetX, targetY = container.width, container.height, container.position.x, container.position.y
+
+	-- shrink container
+	container.position.x = targetX + targetW / 2
+	container.width = 1
+
+	-- hide children
+	for i, child in ipairs(container.children) do
+		child.visible = false
+	end
+
+	Timer.tween(time, container, { width = targetW }, 'linear', function() container:show() end)
+	Timer.tween(time, container.position, { x = targetX }, 'linear')
 end
 
 function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, customTheme)

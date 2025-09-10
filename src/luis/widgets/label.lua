@@ -3,37 +3,43 @@ local decorators = require("luis.3rdparty.decorators")
 
 local label = {}
 
-local luis  -- This will store the reference to the core library
+local luis -- This will store the reference to the core library
 function label.setluis(luisObj)
-    luis = luisObj
+	luis = luisObj
 end
 
 local function applyThemeToText(customTheme)
-    local textTheme = customTheme or luis.theme.text
-    love.graphics.setColor(textTheme.color)
-    love.graphics.setFont(textTheme.font)
-    return textTheme
+	local textTheme = customTheme or luis.theme.text
+	love.graphics.setColor(textTheme.color)
+	love.graphics.setFont(textTheme.font)
+	return textTheme
 end
 
 -- Label
 function label.new(value, width, height, row, col, align, customTheme)
-    local labelTheme = customTheme or luis.theme.text
-    return {
-        type = "Label",
-        value = value,
-        width = width * luis.gridSize,
-        height = height * luis.gridSize,
+	local labelTheme = customTheme or luis.theme.text
+	return {
+		type = "Label",
+		value = value,
+		width = width * luis.gridSize,
+		height = height * luis.gridSize,
 		position = Vector2D.new((col - 1) * luis.gridSize, (row - 1) * luis.gridSize),
 		theme = labelTheme,
 		decorator = nil,
-        
-        defaultDraw = function(self)
-            local textTheme = applyThemeToText(self.theme or luis)
-            love.graphics.printf(self.value, self.position.x, self.position.y + (self.height - textTheme.font:getHeight()) / 2 + 3, self.width, align or textTheme.align)
-        end,
+		visible = true, -- New visibility property, default is visible
+
+		defaultDraw = function(self)
+			local textTheme = applyThemeToText(self.theme or luis)
+			love.graphics.printf(self.value, self.position.x,
+				self.position.y + (self.height - textTheme.font:getHeight()) / 2 + 3, self.width,
+				align or textTheme.align)
+		end,
 
 		-- Draw method that can use a decorator
 		draw = function(self)
+			-- Skip drawing if not visible
+			if not self.visible then return end
+			
 			if self.decorator then
 				self.decorator:draw()
 			else
@@ -46,10 +52,10 @@ function label.new(value, width, height, row, col, align, customTheme)
 			self.decorator = decorators[decoratorType].new(self, ...)
 		end,
 
-        setText = function(self, newText)
-            self.value = newText
-        end
-    }
+		setText = function(self, newText)
+			self.value = newText
+		end
+	}
 end
 
 return label
