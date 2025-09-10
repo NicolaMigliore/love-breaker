@@ -19,7 +19,6 @@ function Title:enter()
 		font = FONTS.robotic_l,
 		align = 'center',
 	}
-	-- local l_title = Luis.createElement('main', 'Label', 'PAUSE', lw, lh, 1, 1, 'center')
 	local l_title = UI:newLabel('main', 'LOVE-BREAKER', lw, lh, ALIGNMENTS.center, customTheme)
 	c_main:addChild(l_title, 2, lCol)
 

@@ -20,8 +20,7 @@ end
 
 function Pause:getContainer()
 	-- UI - create main layer
-	self.layers.main = Luis.newLayer('main')
-	Luis.setCurrentLayer('main')
+	self.layers.main = UI:newLayer('main')
 
 	local decorator = THEMES.basic.decorator
 
@@ -38,7 +37,6 @@ function Pause:getContainer()
 	local l_title = UI:newLabel('main', 'PAUSE', lw, lh, ALIGNMENTS.center, customTheme)
 	c_main:addChild(l_title, 2, lCol)
 
-	-- local l_title = Luis.createElement('main', 'Label', 'PAUSE', 16, 3, 1, 1, 'center', customTheme)
 	local bw, bh = 8, 2
 	local bCol = (cw / 2) - (bw / 2) + 1
 	local b_resume = UI:newButton('main', 'RESUME', bw, bh, decorator, nil, function() GameState.pop() end)
