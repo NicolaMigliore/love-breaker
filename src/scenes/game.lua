@@ -338,22 +338,22 @@ function Game:generateRandomBricks()
 	local rows = {
 		'bbbbbbb',
 		'bbxxxbb',
-		'bbbpbbb',
-		'pbbpbbp',
+		'bbbdbbb',
+		'dbbdbbd',
 		'hhhhhhh',
 		'hbhbhbh',
 		'xxxxxxx',
 		'bbxxxbb',
-		'bpxxxpb',
+		'bdxxxdb',
 		'hbxxxhb',
 		'xhbbbhx',
 		'xxeeexx',
 		'eeeeeee',
 		'heheheh',
 		'xheeehx',
-		'hphhhph',
+		'hdhhhdh',
 		'xxbbbxx',
-		'bpbpbpb',
+		'bdbdbdb',
 	}
 	local noLines = 3 + math.floor(love.math.random(4))
 	local level = {}
