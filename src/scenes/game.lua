@@ -9,6 +9,7 @@ local levels = require('assets.level-sets.base')
 
 local Game = {
 	balls = {},
+	combo = 0,
 	ballRad = 10,
 	ballSpeed = 400,
 	paddle = nil,
@@ -23,6 +24,7 @@ local Game = {
 	isEndless = false,
 	layers = {},
 	timers = {},
+	sfx = {},
 }
 
 function Game:enter(previous, endless)
@@ -31,6 +33,7 @@ function Game:enter(previous, endless)
 
 	self.score = 0
 	self.lives = 3
+	self.combo = 0
 	
 	self.isEndless = endless
 	self.curLevel = 1
@@ -51,6 +54,8 @@ function Game:enter(previous, endless)
 
 	local labelTheme = Lume.clone(UI:getTheme().text)
 	labelTheme.color = PALETTE.black
+	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_combo, 1, maxCol - 26)
 	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
 	c_hud:addChild(l_lives, 1, maxCol - 17)
 	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
@@ -63,6 +68,9 @@ function Game:enter(previous, endless)
 			c_hud = c_hud
 		}
 	}
+
+	-- load sound FXs
+	self:loadSFX()
 end
 
 -- MARK: Update
@@ -73,8 +81,11 @@ function Game:update(dt)
 	for i, ball in ipairs(self.balls) do
 		ball.rad = self.ballRad
 		ball.speed = self.ballSpeed
-		local hasCollision, collisionPoint, collisionResponse = ball:update(dt, self.paddle, self.bricks)
+		local hasCollision, collisionPoint, collisionResponse, hitBrick, hitPaddle = ball:update(dt, self.paddle, self.bricks)
 		if hasCollision then
+			if hitBrick then self.combo = self.combo + 1 end
+			if hitPaddle then self.combo = 0 end
+			-- particles
 			local r1, r2 = 0, -math.pi
 			if math.abs(collisionResponse.x) > math.abs(collisionResponse.y) then
 				r1 = r1 + math.pi / 2
@@ -82,6 +93,11 @@ function Game:update(dt)
 			end
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r1)
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r2)
+
+			-- sounds
+			local comboSound = 'bounce_'..math.min(math.floor(self.combo / 5), 3)
+			self.sfx[comboSound]:stop()
+			self.sfx[comboSound]:play()
 		end
 	end
 
@@ -180,8 +196,9 @@ function Game:update(dt)
 	-- update hud
 	local hudContainer = self.layers.hud.containers.c_hud
 	local labels = hudContainer.children
-	labels[1]:setText('LIVES '..self.lives)
-	labels[2]:setText('SCORE '..self.score)
+	labels[1]:setText('COMBO '..self.combo)
+	labels[2]:setText('LIVES '..self.lives)
+	labels[3]:setText('SCORE '..self.score)
 end
 
 -- MARK: Draw
@@ -344,6 +361,15 @@ function Game:generateRandomBricks()
 		table.insert(level, Utils.rndTablePick(rows))
 	end
 	return self:generateBricks(level)
+end
+
+function Game:loadSFX()
+	self.sfx = {
+		bounce_0 = love.audio.newSource('assets/sfx/bounce_0.wav', 'static'),
+		bounce_1 = love.audio.newSource('assets/sfx/bounce_1.wav', 'static'),
+		bounce_2 = love.audio.newSource('assets/sfx/bounce_2.wav', 'static'),
+		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
+	}
 end
 
 return Game
