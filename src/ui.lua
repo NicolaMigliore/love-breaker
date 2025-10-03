@@ -8,6 +8,12 @@ function UI:new(windowWidth, windowHeight)
 
 	love.graphics.setFont(FONTS.robotic)
 	Luis.setTheme(THEMES.basic)
+
+	-- load sfx
+	self.sfx = {
+		click = love.audio.newSource('assets/sfx/click.wav', 'static'),
+		slide = love.audio.newSource('assets/sfx/slide_open.wav', 'static'),
+	}
 end
 
 function UI:update(dt)
@@ -138,11 +144,18 @@ function UI:animateContainer(container, time)
 
 	Timer.tween(time, container, { width = targetW }, 'linear', function() container:show() end)
 	Timer.tween(time, container.position, { x = targetX }, 'linear')
+	self.sfx.slide:stop()
+	self.sfx.slide:play()
 end
 
 function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, customTheme)
+	local onReleaseFn = function()
+		onRelease()
+		self.sfx.click:play()
+	end
+
 	local theme = customTheme or THEMES.basic.button
-	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onRelease, 1, 1, theme)
+	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onReleaseFn, 1, 1, theme)
 	if btn and decorator then
 		btn:setDecorator(
 			'CustomSlice9Decorator',

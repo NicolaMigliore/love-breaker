@@ -11,6 +11,7 @@ Push = require 'libs.push'
 Baton = require 'libs.baton'
 Flux = require 'libs.flux'
 Utils = require 'libs.utils'
+Shack = require 'libs.shack'
 
 local initLuis = require 'luis.init'
 Luis = initLuis("luis/widgets")

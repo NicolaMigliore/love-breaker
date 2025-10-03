@@ -98,6 +98,9 @@ function Game:update(dt)
 			local comboSound = 'bounce_'..math.min(math.floor(self.combo / 5), 3)
 			self.sfx[comboSound]:stop()
 			self.sfx[comboSound]:play()
+
+			local shakeStr = math.min(math.floor(self.combo / 5), 4) * 3
+			Shack:setShake(shakeStr)
 		end
 	end
 
@@ -285,12 +288,15 @@ function Game:setLevel(lvl)
 			self.score = self.score - 20
 			if #self.balls == 0 then
 				self.lives = self.lives - 1
-
 				if self.lives <= 0 then
 					GameState.switch(GAME_SCENES.gameOver)
 				else
 					self:serveBall()
 				end
+
+				Shack:setShake(15)
+				Shack:setRotation(.1)
+				self.sfx.fail:play()
 			end
 		end,
 		function(drop, index)
@@ -369,6 +375,7 @@ function Game:loadSFX()
 		bounce_1 = love.audio.newSource('assets/sfx/bounce_1.wav', 'static'),
 		bounce_2 = love.audio.newSource('assets/sfx/bounce_2.wav', 'static'),
 		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
+		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
 	}
 end
 
