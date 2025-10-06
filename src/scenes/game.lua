@@ -71,6 +71,8 @@ function Game:enter(previous, endless)
 
 	-- load sound FXs
 	self:loadSFX()
+
+	self.canvas = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT)
 end
 
 -- MARK: Update
@@ -208,6 +210,9 @@ end
 function Game:draw()
 	-- Push:start()
 
+	love.graphics.setCanvas(self.canvas)
+	love.graphics.clear()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	if self.isServing then
@@ -235,6 +240,19 @@ function Game:draw()
 
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
+
+	-- reset canvas
+	love.graphics.setCanvas()
+
+	-- draw with blur shader
+	love.graphics.setShader(SHADERS.BlurShader)
+	love.graphics.draw(self.canvas, 0, 0)
+	-- canvas:newImageData():encode("png", "filename.png")
+
+	-- draw with default shader
+	love.graphics.setShader()
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(self.canvas, 0, 0)
 
 	-- UI
 	-- love.graphics.setColor(0, 0, 0)

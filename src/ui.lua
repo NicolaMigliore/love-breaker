@@ -14,6 +14,8 @@ function UI:new(windowWidth, windowHeight)
 		click = love.audio.newSource('assets/sfx/click.wav', 'static'),
 		slide = love.audio.newSource('assets/sfx/slide_open.wav', 'static'),
 	}
+
+	self.canvas = love.graphics.newCanvas(windowWidth, windowHeight)
 end
 
 function UI:update(dt)
@@ -43,7 +45,23 @@ function UI:update(dt)
 end
 
 function UI:draw()
+	-- draw to canvas
+	love.graphics.setCanvas(self.canvas)
+	love.graphics.clear(0, 0, 0, 0)
 	Luis:draw()
+
+	-- reset canvas
+	love.graphics.setCanvas()
+
+	-- draw with blur shader
+	love.graphics.setShader(SHADERS.BlurShader)
+	love.graphics.draw(self.canvas, 0, 0)
+
+	-- draw with default shader
+	love.graphics.setShader()
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(self.canvas, 0, 0)
+
 end
 
 function UI:mousepressed(x, y, button, istouch)

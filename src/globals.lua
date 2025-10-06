@@ -80,4 +80,8 @@ GAME_SCENES = {
 	pause = require 'scenes.pause',
 }
 
+SHADERS = {
+	BlurShader = love.graphics.newShader('shaders/gausianBlur.fs')
+}
+
 TIME = 0
