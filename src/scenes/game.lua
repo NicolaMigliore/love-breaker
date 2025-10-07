@@ -213,6 +213,10 @@ function Game:draw()
 	love.graphics.setCanvas(self.canvas)
 	love.graphics.clear()
 
+	-- draw frame
+	love.graphics.setColor(PALETTE.orange_2)
+	love.graphics.rectangle('line', 10, 10, FIXED_WIDTH - 20, FIXED_HEIGHT - 60, 5)
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	if self.isServing then
@@ -247,7 +251,6 @@ function Game:draw()
 	-- draw with blur shader
 	love.graphics.setShader(SHADERS.BlurShader)
 	love.graphics.draw(self.canvas, 0, 0)
-	-- canvas:newImageData():encode("png", "filename.png")
 
 	-- draw with default shader
 	love.graphics.setShader()
@@ -288,7 +291,7 @@ function Game:setLevel(lvl)
 
 	-- setup entities
 	local pw, ph = 140, 14
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
+	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 65 - ph / 2, pw, ph)
 
 	self.balls = {}
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)

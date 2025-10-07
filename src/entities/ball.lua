@@ -101,29 +101,29 @@ end
 --- Run collision checks with game bounds
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
 function Ball:boundsCollision()
-	local maxX = FIXED_WIDTH
-	local maxY = FIXED_HEIGHT
+	local minX, maxX = 10, FIXED_WIDTH - 10
+	local minY, maxY = 10, FIXED_HEIGHT
 	local responseVector = Vector(0,0)
 
-	local hitRight, hitLeft = (self.pos.x + self.rad > maxX), (self.pos.x - self.rad < 0)
+	local hitRight, hitLeft = (self.pos.x + self.rad > maxX), (self.pos.x - self.rad < minX)
 	local invertX = hitRight or hitLeft
 	if hitRight then responseVector = Vector(-1, 0) end
 	if hitLeft then responseVector = Vector(1, 0) end
 	if invertX then
 		self.vel.x = -self.vel.x
-		self.pos.x = Utils.mid(0 + self.rad, self.pos.x, maxX - self.rad)
+		self.pos.x = Utils.mid(minX + self.rad, self.pos.x, maxX - self.rad)
 		self.collisionX = .1
 		self.collision = true
 		return responseVector
 	end
 
-	local hitTop, hitBottom = (self.pos.y - self.rad < 0), (self.pos.y + self.rad > maxY)
+	local hitTop, hitBottom = (self.pos.y - self.rad < minY), (self.pos.y + self.rad > maxY)
 	local invertY = hitTop or hitBottom
 	if hitTop then responseVector = Vector(0, 1) end
 	if hitBottom then responseVector = Vector(0, -1) end
 	if invertY then
 		self.vel.y = -self.vel.y
-		self.pos.y = Utils.mid(0 + self.rad, self.pos.y, maxY - self.rad)
+		self.pos.y = Utils.mid(minY + self.rad, self.pos.y, maxY - self.rad)
 		self.collisionY = .1
 		self.collision = true
 		return responseVector
