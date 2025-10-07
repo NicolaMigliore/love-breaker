@@ -81,7 +81,8 @@ GAME_SCENES = {
 }
 
 SHADERS = {
-	BlurShader = love.graphics.newShader('shaders/gausianBlur.fs')
+	BlurShader = love.graphics.newShader('shaders/gausianBlur.fs'),
+	PerspectiveShader = love.graphics.newShader('shaders/perspective.fs', 'shaders/perspective.vs')
 }
 
 TIME = 0
