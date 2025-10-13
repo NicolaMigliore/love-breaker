@@ -40,7 +40,6 @@ function Ball:update(dt, paddle, bricks)
 		local trailPos = self.pos - normVelocity * 10
 		self.trail:setPosition(trailPos.x, trailPos.y)
 		local cur_angle = Utils.round(math.atan2(self.vel.y, self.vel.x), 4)
-		-- print(Inspect(cur_angle))
 		self.trail:setDirection(cur_angle - math.pi)
 	end
 

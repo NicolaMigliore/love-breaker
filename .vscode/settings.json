@@ -31,5 +31,8 @@
     },
     "search.exclude": {
         "dist": true
-    }
+    },
+    "cSpell.words": [
+        "powerup"
+    ]
 }

@@ -96,6 +96,7 @@ function UI:getTheme()
 	return Luis.theme
 end
 
+-- MARK: Layers
 --- Create new layer
 ---@param layerName string name of the new layer
 ---@param setCurrent boolean weather the layer should be set as currently active
@@ -114,6 +115,18 @@ function UI:removeLayer(layerName)
 	Luis.removeLayer(layerName)
 end
 
+--- Enable the provided layer
+---@param layerName string the name of the layer to remove
+function UI:enableLayer(layerName)
+	Luis.enableLayer(layerName)
+end
+
+--- Disable the provided layer
+---@param layerName string the name of the layer to remove
+function UI:disableLayer(layerName)
+	Luis.disableLayer(layerName)
+end
+
 --- Pops the current layer from the layer stack and disables it making the new top layer in the stack active.
 function UI:popLayer()
 	Luis.popLayer()
@@ -123,6 +136,7 @@ function UI:layerExists(layerName)
 	return Luis.layerExists(layerName)
 end
 
+-- MARK: Containers
 --- Create new container
 ---@param layerName string
 ---@param w number
@@ -166,6 +180,7 @@ function UI:animateContainer(container, time)
 	self.sfx.slide:play()
 end
 
+-- MARK: Buttons
 function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, customTheme)
 	local onReleaseFn = function()
 		onRelease()
@@ -188,6 +203,7 @@ function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, cust
 	return btn
 end
 
+-- MARK: Labels
 function UI:newLabel(layerName, text, w, h, align, customTheme)
 	local defaultTheme = {
 		color = { 1, 1, 1, 1 },
