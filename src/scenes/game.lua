@@ -4,6 +4,7 @@ local Brick, BrickTypes = unpack(require 'entities.brick')
 local Drop, DropTypes, DropTypeColors = unpack(require 'entities.drop')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
+CardManager = require('src.entities.cardManager')
 
 local levels = require('assets.level-sets.base')
 
@@ -25,6 +26,7 @@ local Game = {
 	layers = {},
 	timers = {},
 	sfx = {},
+	cardManager = CardManager(),
 }
 
 function Game:enter(previous, endless)
@@ -153,16 +155,20 @@ function Game:update(dt)
 		-- check paddle collision
 		local paddleCollide = Utils.CollisionRectRect(drop.pos.x, drop.pos.y, drop.w, drop.h, self.paddle.pos.x, self.paddle.pos.y, self.paddle.w, self.paddle.h)
 		if paddleCollide then
+			local msg = nil
 			if drop.type == DropTypes.life then
 				self.lives = self.lives + 1
+				msg = '1 UP'
 			elseif drop.type == DropTypes.bigBall then
 				if self.timers.bigBall then Timer.cancel(self.timers.bigBall) self.timers.bigBall = nil end
 				self.ballRad = 20
 				self.timers.bigBall = Timer.after(10, function() self.ballRad = 10 end)
+				msg = 'BIG BALL'
 			elseif drop.type == DropTypes.speedPaddle then
 				if self.timers.paddleSpeed then Timer.cancel(self.timers.paddleSpeed) self.timers.paddleSpeed = nil end
 				self.paddleSpeed = 800
 				Timer.after(10, function() self.paddleSpeed = 600 end)
+				msg = 'GOTTA GO FAST'
 			elseif drop.type == DropTypes.multiBall then
 				local lastBall = self.balls[#self.balls]
 				local signX, signY = Utils.sign(lastBall.vel.x), Utils.sign(lastBall.vel.y)
@@ -178,13 +184,24 @@ function Game:update(dt)
 				b2.speed = self.ballSpeed
 				b2.served = true
 				table.insert(self.balls, b2)
+				msg = 'MULTI BALLS'
 			end
 
+			-- spawn particles
 			local typeColor = DropTypeColors[drop.type]
 			local colors = { typeColor[1], typeColor[2], typeColor[3], 1, 0.331298828125, 0.33332443237305, 0.4609375, 1, 0.72265625, 0.72265625, 0.72265625, 0.3984375}
 			local px = self.paddle.pos.x + self.paddle.w / 2 + love.math.random(10) - 5
 			local py = drop.pos.y + drop.h + love.math.random(8) - 4
 			PARTICLES:addBigPuff(px, py, nil, colors)
+
+			-- spawn card
+			self.cardManager:addCard(msg, 1, typeColor)
+
+			-- play sound
+			self.sfx.powerup:stop()
+			self.sfx.powerup:play()
+
+			-- remove drop
 			table.remove(DROPS, i)
 		end
 	end
@@ -256,6 +273,8 @@ function Game:draw()
 	love.graphics.setShader()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(self.canvas, 0, 0)
+
+	self.cardManager:draw()
 
 	-- UI
 	-- love.graphics.setColor(0, 0, 0)
@@ -397,6 +416,7 @@ function Game:loadSFX()
 		bounce_2 = love.audio.newSource('assets/sfx/bounce_2.wav', 'static'),
 		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
 		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
+		powerup = love.audio.newSource('assets/sfx/powerup.wav', 'static'),
 	}
 end
 
