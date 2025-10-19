@@ -4,7 +4,7 @@ local Brick, BrickTypes = unpack(require 'entities.brick')
 local Drop, DropTypes, DropTypeColors = unpack(require 'entities.drop')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
-CardManager = require('src.entities.cardManager')
+CardManager = require('entities.cardManager')
 
 local levels = require('assets.level-sets.base')
 

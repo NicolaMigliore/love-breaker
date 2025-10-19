@@ -1,4 +1,4 @@
-local Card = require 'src.entities.card'
+local Card = require 'entities.card'
 local CardManager = Object:extend()
 
 function CardManager:new()
