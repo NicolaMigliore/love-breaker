@@ -13,6 +13,9 @@ function love.load()
 		{ fullscreen = false, resizable = true, pixelperfect = true })
 	Shack:setDimensions(gameWidth, gameHeight)
 
+	-- load shader effects
+	loadEffects(windowWidth, windowHeight)
+
 	-- UI setup
 	UI = UIClass(windowWidth, windowHeight)
 
@@ -49,14 +52,29 @@ end
 
 function love.draw()
 	Shack:apply()
-	love.graphics.setColor(.07, .07, .09)
-	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
-
 	UI:draw()
+
+	love.graphics.setColor(1, 1, 1, 1)
+	-- draw basic canvas
+	love.graphics.draw(CANVAS.basic, 0, 0)
+	-- draw effect canvas
+	EFFECT(function()
+		love.graphics.draw(CANVAS.effects, 0, 0)
+	end)
+
+	-- clear canvases
+	for name, canvas in pairs(CANVAS) do
+		love.graphics.setCanvas(canvas)
+		love.graphics.clear(PALETTE.black)
+	end
+	love.graphics.setCanvas()
 end
 
 function love.resize(w, h)
 	Push:resize(w, h)
+	if EFFECT then 
+		EFFECT.resize(w, h)
+	end
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -71,3 +89,22 @@ function love.joystickadded(joystick)
 	INPUT.joystick = joystick
 end
 
+function loadEffects(windowWidth, windowHeight)
+	EFFECT = Moonshine(windowWidth, windowHeight, Moonshine.effects.glow)
+		.chain(Moonshine.effects.scanlines)
+		.chain(Moonshine.effects.vignette)
+	
+	-- configure glow
+	EFFECT.glow.min_luma = .4
+	EFFECT.glow.strength = 15
+
+	-- configure scan lines
+	EFFECT.width = 4
+	EFFECT.scanlines.opacity = 0.2
+	EFFECT.scanlines.frequency = windowHeight / 3
+	EFFECT.scanlines.color = { PALETTE.blue_1[1], PALETTE.blue_1[2], PALETTE.blue_1[3] }
+	
+	-- configure vignette	
+	EFFECT.vignette.softness = .3
+	EFFECT.vignette.opacity = 0.2
+end

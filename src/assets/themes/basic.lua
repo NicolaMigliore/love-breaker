@@ -3,7 +3,7 @@ local basicTheme = {
 		font = love.graphics.newFont(14)
 	},
 	background = {
-		color = { 1, 0, 0, 1 } --PALETTE.black
+		color = PALETTE.black
 	},
 	text = {
 		color = PALETTE.white,

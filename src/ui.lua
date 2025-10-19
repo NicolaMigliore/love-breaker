@@ -45,22 +45,11 @@ function UI:update(dt)
 end
 
 function UI:draw()
-	-- draw to canvas
-	love.graphics.setCanvas(self.canvas)
-	love.graphics.clear(0, 0, 0, 0)
+	love.graphics.setCanvas(CANVAS.effects)
 	Luis:draw()
 
 	-- reset canvas
 	love.graphics.setCanvas()
-
-	-- draw with blur shader
-	love.graphics.setShader(SHADERS.BlurShader)
-	love.graphics.draw(self.canvas, 0, 0)
-
-	-- draw with default shader
-	love.graphics.setShader()
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(self.canvas, 0, 0)
 
 end
 

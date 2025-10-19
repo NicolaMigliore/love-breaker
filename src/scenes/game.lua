@@ -50,8 +50,8 @@ function Game:enter(previous, endless)
 	local maxRow = UI:getMaxRow()
 
 	local containerTheme = Lume.clone(UI:getTheme().container)
-	containerTheme.backgroundColor = PALETTE.orange_2
-	containerTheme.borderColor = PALETTE.orange_2
+	containerTheme.backgroundColor = PALETTE.orange_3
+	containerTheme.borderColor = PALETTE.orange_3
 	local c_hud = UI:newContainer('hud', maxCol, 2, maxRow - 1, 1, nil, containerTheme, 'hudContainer')
 
 	local labelTheme = Lume.clone(UI:getTheme().text)
@@ -227,16 +227,11 @@ end
 
 -- MARK: Draw
 function Game:draw()
-	-- Push:start()
-
-	love.graphics.setCanvas(self.canvas)
-	love.graphics.clear()
+	love.graphics.setCanvas(CANVAS.effects)
 
 	-- draw frame
 	love.graphics.setColor(PALETTE.orange_2)
 	love.graphics.rectangle('line', 10, 10, FIXED_WIDTH - 20, FIXED_HEIGHT - 60, 5)
-
-	love.graphics.setColor(1, 1, 1, 1)
 
 	if self.isServing then
 		local nextBall = self.balls[#self.balls]
@@ -264,31 +259,10 @@ function Game:draw()
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
 
-	-- reset canvas
-	love.graphics.setCanvas()
-
-	-- draw with blur shader
-	love.graphics.setShader(SHADERS.BlurShader)
-	love.graphics.draw(self.canvas, 0, 0)
-
-	-- draw with default shader
-	love.graphics.setShader()
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(self.canvas, 0, 0)
-
 	self.cardManager:draw()
 
-	-- UI
-	-- love.graphics.setColor(0, 0, 0)
-	-- love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
-	-- love.graphics.setColor(1, 1, 1)
-
-	-- Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15,
-	-- 	ALIGNMENTS.right)
-
-	-- Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
-
-	-- Push:finish()
+	-- reset canvas
+	love.graphics.setCanvas()
 end
 
 function Game:leave()
