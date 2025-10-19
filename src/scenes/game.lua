@@ -75,6 +75,8 @@ function Game:enter(previous, endless)
 	self:loadSFX()
 
 	self.canvas = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT)
+
+	self:setSuddenDeathTimer()
 end
 
 -- MARK: Update
@@ -83,7 +85,7 @@ function Game:update(dt)
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do
-		ball.rad = self.ballRad
+		ball.rad = self.suddenDeath and 20 or self.ballRad
 		ball.speed = self.ballSpeed
 		local hasCollision, collisionPoint, collisionResponse, hitBrick, hitPaddle = ball:update(dt, self.paddle, self.bricks)
 		if hasCollision then
@@ -120,7 +122,7 @@ function Game:update(dt)
 		end
 	end
 
-	self.paddle.speed = self.paddleSpeed
+	self.paddle.speed = self.suddenDeath and 800 or self.paddleSpeed
 	self.paddle:update(dt)
 
 	-- update bricks
@@ -207,7 +209,7 @@ function Game:update(dt)
 	end
 
 	-- update trigger
-	self.gameOverTrigger:update(dt, self.balls, DROPS)
+	self.gameOverTrigger:update(dt, self.balls, self.bricks, DROPS)
 	if #self.bricks == 0 then
 		self.score = self.score + self.lives * 50
 		GameState.switch(GAME_SCENES.gameOver)
@@ -310,7 +312,7 @@ function Game:setLevel(lvl)
 
 	-- setup entities
 	local pw, ph = 140, 14
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 65 - ph / 2, pw, ph)
+	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 80 - ph / 2, pw, ph)
 
 	self.balls = {}
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)
@@ -339,6 +341,9 @@ function Game:setLevel(lvl)
 				self.sfx.fail:play()
 			end
 		end,
+		function(brick, index)
+			GameState.switch(GAME_SCENES.gameOver)
+		end,
 		function(drop, index)
 			table.remove(DROPS, index)
 		end)
@@ -348,6 +353,7 @@ function Game:setLevel(lvl)
 	else
 		self.bricks = self:generateBricks(levels[lvl])
 	end
+	self:setSuddenDeathTimer()
 end
 
 --- generate the bricks for the provided level
@@ -409,6 +415,26 @@ function Game:generateRandomBricks()
 	return self:generateBricks(level)
 end
 
+function Game:setSuddenDeathTimer()
+	-- clear step timer
+	if self.stepTimer then
+		Timer.clear(self.stepTimer)
+		self.stepTimer = nil
+	end
+	self.suddenDeath = false
+	self.suddenDeathTimer = Timer.after(120, function()
+		self.suddenDeath = true
+		self.cardManager:addCard('SUDDEN DEATH', 1, PALETTE.red_1, true)
+		self.stepTimer = Timer.every(1, function()
+			if GameState.current() == GAME_SCENES.game then
+				for i, brick in ipairs(self.bricks) do
+					brick.pos.y = brick.pos.y + 10
+				end
+			end
+		end, 100)
+	end)
+end
+
 function Game:loadSFX()
 	self.sfx = {
 		bounce_0 = love.audio.newSource('assets/sfx/bounce_0.wav', 'static'),
@@ -418,6 +444,14 @@ function Game:loadSFX()
 		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
 		powerup = love.audio.newSource('assets/sfx/powerup.wav', 'static'),
 	}
+end
+
+function Game:leave()
+	-- clear step timer
+	if self.stepTimer then
+		Timer.clear(self.stepTimer)
+		self.stepTimer = nil
+	end
 end
 
 return Game
