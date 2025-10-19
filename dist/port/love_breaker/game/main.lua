@@ -11,6 +11,7 @@ function love.load()
 	local windowWidth, windowHeight = 720, 720           --love.window.getDesktopDimensions()
 	Push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight,
 		{ fullscreen = false, resizable = true, pixelperfect = true })
+	Shack:setDimensions(gameWidth, gameHeight)
 
 	-- UI setup
 	UI = UIClass(windowWidth, windowHeight)
@@ -40,12 +41,14 @@ function love.update(dt)
 	Timer.update(dt)
 	Flux.update(dt)
 	UI:update(dt)
+	Shack:update(dt)
 	INPUT:update()
 
 	if INPUT:pressed('debug') then DEBUG = not DEBUG end
 end
 
 function love.draw()
+	Shack:apply()
 	love.graphics.setColor(.07, .07, .09)
 	love.graphics.rectangle('fill', 0, 0, FIXED_WIDTH, FIXED_HEIGHT)
 

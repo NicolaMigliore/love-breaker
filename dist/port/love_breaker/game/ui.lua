@@ -8,6 +8,14 @@ function UI:new(windowWidth, windowHeight)
 
 	love.graphics.setFont(FONTS.robotic)
 	Luis.setTheme(THEMES.basic)
+
+	-- load sfx
+	self.sfx = {
+		click = love.audio.newSource('assets/sfx/click.wav', 'static'),
+		slide = love.audio.newSource('assets/sfx/slide_open.wav', 'static'),
+	}
+
+	self.canvas = love.graphics.newCanvas(windowWidth, windowHeight)
 end
 
 function UI:update(dt)
@@ -37,7 +45,23 @@ function UI:update(dt)
 end
 
 function UI:draw()
+	-- draw to canvas
+	love.graphics.setCanvas(self.canvas)
+	love.graphics.clear(0, 0, 0, 0)
 	Luis:draw()
+
+	-- reset canvas
+	love.graphics.setCanvas()
+
+	-- draw with blur shader
+	love.graphics.setShader(SHADERS.BlurShader)
+	love.graphics.draw(self.canvas, 0, 0)
+
+	-- draw with default shader
+	love.graphics.setShader()
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(self.canvas, 0, 0)
+
 end
 
 function UI:mousepressed(x, y, button, istouch)
@@ -63,11 +87,16 @@ function UI:getMaxRow()
 	return math.floor(screenH / gridCellSize)
 end
 
+function UI:getGridSize()
+	return Luis.getGridSize()
+end
+
 --- get the currently applied theme
 function UI:getTheme()
 	return Luis.theme
 end
 
+-- MARK: Layers
 --- Create new layer
 ---@param layerName string name of the new layer
 ---@param setCurrent boolean weather the layer should be set as currently active
@@ -86,6 +115,18 @@ function UI:removeLayer(layerName)
 	Luis.removeLayer(layerName)
 end
 
+--- Enable the provided layer
+---@param layerName string the name of the layer to remove
+function UI:enableLayer(layerName)
+	Luis.enableLayer(layerName)
+end
+
+--- Disable the provided layer
+---@param layerName string the name of the layer to remove
+function UI:disableLayer(layerName)
+	Luis.disableLayer(layerName)
+end
+
 --- Pops the current layer from the layer stack and disables it making the new top layer in the stack active.
 function UI:popLayer()
 	Luis.popLayer()
@@ -95,6 +136,7 @@ function UI:layerExists(layerName)
 	return Luis.layerExists(layerName)
 end
 
+-- MARK: Containers
 --- Create new container
 ---@param layerName string
 ---@param w number
@@ -120,9 +162,33 @@ function UI:newContainer(layerName, w, h, row, col, decorator, customTheme, cont
 	return container
 end
 
+function UI:animateContainer(container, time)
+	local targetW, targetH, targetX, targetY = container.width, container.height, container.position.x, container.position.y
+
+	-- shrink container
+	container.position.x = targetX + targetW / 2
+	container.width = 1
+
+	-- hide children
+	for i, child in ipairs(container.children) do
+		child.visible = false
+	end
+
+	Timer.tween(time, container, { width = targetW }, 'linear', function() container:show() end)
+	Timer.tween(time, container.position, { x = targetX }, 'linear')
+	self.sfx.slide:stop()
+	self.sfx.slide:play()
+end
+
+-- MARK: Buttons
 function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, customTheme)
+	local onReleaseFn = function()
+		onRelease()
+		self.sfx.click:play()
+	end
+
 	local theme = customTheme or THEMES.basic.button
-	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onRelease, 1, 1, theme)
+	local btn = Luis.createElement(layerName, 'Button', text, w, h, onClick, onReleaseFn, 1, 1, theme)
 	if btn and decorator then
 		btn:setDecorator(
 			'CustomSlice9Decorator',
@@ -137,6 +203,7 @@ function UI:newButton(layerName, text, w, h, decorator, onClick, onRelease, cust
 	return btn
 end
 
+-- MARK: Labels
 function UI:newLabel(layerName, text, w, h, align, customTheme)
 	local defaultTheme = {
 		color = { 1, 1, 1, 1 },

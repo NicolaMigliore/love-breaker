@@ -4,11 +4,13 @@ local Brick, BrickTypes = unpack(require 'entities.brick')
 local Drop, DropTypes, DropTypeColors = unpack(require 'entities.drop')
 local TriggerRect = require 'entities.triggerRect'
 local Particles = require 'particles'
+CardManager = require('entities.cardManager')
 
 local levels = require('assets.level-sets.base')
 
 local Game = {
 	balls = {},
+	combo = 0,
 	ballRad = 10,
 	ballSpeed = 400,
 	paddle = nil,
@@ -23,6 +25,8 @@ local Game = {
 	isEndless = false,
 	layers = {},
 	timers = {},
+	sfx = {},
+	cardManager = CardManager(),
 }
 
 function Game:enter(previous, endless)
@@ -31,6 +35,7 @@ function Game:enter(previous, endless)
 
 	self.score = 0
 	self.lives = 3
+	self.combo = 0
 	
 	self.isEndless = endless
 	self.curLevel = 1
@@ -51,6 +56,8 @@ function Game:enter(previous, endless)
 
 	local labelTheme = Lume.clone(UI:getTheme().text)
 	labelTheme.color = PALETTE.black
+	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_combo, 1, maxCol - 26)
 	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
 	c_hud:addChild(l_lives, 1, maxCol - 17)
 	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
@@ -63,6 +70,13 @@ function Game:enter(previous, endless)
 			c_hud = c_hud
 		}
 	}
+
+	-- load sound FXs
+	self:loadSFX()
+
+	self.canvas = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT)
+
+	self:setSuddenDeathTimer()
 end
 
 -- MARK: Update
@@ -71,10 +85,13 @@ function Game:update(dt)
 
 	-- update balls
 	for i, ball in ipairs(self.balls) do
-		ball.rad = self.ballRad
+		ball.rad = self.suddenDeath and 20 or self.ballRad
 		ball.speed = self.ballSpeed
-		local hasCollision, collisionPoint, collisionResponse = ball:update(dt, self.paddle, self.bricks)
+		local hasCollision, collisionPoint, collisionResponse, hitBrick, hitPaddle = ball:update(dt, self.paddle, self.bricks)
 		if hasCollision then
+			if hitBrick then self.combo = self.combo + 1 end
+			if hitPaddle then self.combo = 0 end
+			-- particles
 			local r1, r2 = 0, -math.pi
 			if math.abs(collisionResponse.x) > math.abs(collisionResponse.y) then
 				r1 = r1 + math.pi / 2
@@ -82,6 +99,14 @@ function Game:update(dt)
 			end
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r1)
 			PARTICLES:addPuff(collisionPoint.x, collisionPoint.y, r2)
+
+			-- sounds
+			local comboSound = 'bounce_'..math.min(math.floor(self.combo / 5), 3)
+			self.sfx[comboSound]:stop()
+			self.sfx[comboSound]:play()
+
+			local shakeStr = math.min(math.floor(self.combo / 5), 4) * 3
+			Shack:setShake(shakeStr)
 		end
 	end
 
@@ -97,7 +122,7 @@ function Game:update(dt)
 		end
 	end
 
-	self.paddle.speed = self.paddleSpeed
+	self.paddle.speed = self.suddenDeath and 800 or self.paddleSpeed
 	self.paddle:update(dt)
 
 	-- update bricks
@@ -132,16 +157,20 @@ function Game:update(dt)
 		-- check paddle collision
 		local paddleCollide = Utils.CollisionRectRect(drop.pos.x, drop.pos.y, drop.w, drop.h, self.paddle.pos.x, self.paddle.pos.y, self.paddle.w, self.paddle.h)
 		if paddleCollide then
+			local msg = nil
 			if drop.type == DropTypes.life then
 				self.lives = self.lives + 1
+				msg = '1 UP'
 			elseif drop.type == DropTypes.bigBall then
 				if self.timers.bigBall then Timer.cancel(self.timers.bigBall) self.timers.bigBall = nil end
 				self.ballRad = 20
 				self.timers.bigBall = Timer.after(10, function() self.ballRad = 10 end)
+				msg = 'BIG BALL'
 			elseif drop.type == DropTypes.speedPaddle then
 				if self.timers.paddleSpeed then Timer.cancel(self.timers.paddleSpeed) self.timers.paddleSpeed = nil end
 				self.paddleSpeed = 800
 				Timer.after(10, function() self.paddleSpeed = 600 end)
+				msg = 'GOTTA GO FAST'
 			elseif drop.type == DropTypes.multiBall then
 				local lastBall = self.balls[#self.balls]
 				local signX, signY = Utils.sign(lastBall.vel.x), Utils.sign(lastBall.vel.y)
@@ -157,19 +186,30 @@ function Game:update(dt)
 				b2.speed = self.ballSpeed
 				b2.served = true
 				table.insert(self.balls, b2)
+				msg = 'MULTI BALLS'
 			end
 
+			-- spawn particles
 			local typeColor = DropTypeColors[drop.type]
 			local colors = { typeColor[1], typeColor[2], typeColor[3], 1, 0.331298828125, 0.33332443237305, 0.4609375, 1, 0.72265625, 0.72265625, 0.72265625, 0.3984375}
 			local px = self.paddle.pos.x + self.paddle.w / 2 + love.math.random(10) - 5
 			local py = drop.pos.y + drop.h + love.math.random(8) - 4
 			PARTICLES:addBigPuff(px, py, nil, colors)
+
+			-- spawn card
+			self.cardManager:addCard(msg, 1, typeColor)
+
+			-- play sound
+			self.sfx.powerup:stop()
+			self.sfx.powerup:play()
+
+			-- remove drop
 			table.remove(DROPS, i)
 		end
 	end
 
 	-- update trigger
-	self.gameOverTrigger:update(dt, self.balls, DROPS)
+	self.gameOverTrigger:update(dt, self.balls, self.bricks, DROPS)
 	if #self.bricks == 0 then
 		self.score = self.score + self.lives * 50
 		GameState.switch(GAME_SCENES.gameOver)
@@ -180,13 +220,21 @@ function Game:update(dt)
 	-- update hud
 	local hudContainer = self.layers.hud.containers.c_hud
 	local labels = hudContainer.children
-	labels[1]:setText('LIVES '..self.lives)
-	labels[2]:setText('SCORE '..self.score)
+	labels[1]:setText('COMBO '..self.combo)
+	labels[2]:setText('LIVES '..self.lives)
+	labels[3]:setText('SCORE '..self.score)
 end
 
 -- MARK: Draw
 function Game:draw()
 	-- Push:start()
+
+	love.graphics.setCanvas(self.canvas)
+	love.graphics.clear()
+
+	-- draw frame
+	love.graphics.setColor(PALETTE.orange_2)
+	love.graphics.rectangle('line', 10, 10, FIXED_WIDTH - 20, FIXED_HEIGHT - 60, 5)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -216,6 +264,20 @@ function Game:draw()
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
 
+	-- reset canvas
+	love.graphics.setCanvas()
+
+	-- draw with blur shader
+	love.graphics.setShader(SHADERS.BlurShader)
+	love.graphics.draw(self.canvas, 0, 0)
+
+	-- draw with default shader
+	love.graphics.setShader()
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(self.canvas, 0, 0)
+
+	self.cardManager:draw()
+
 	-- UI
 	-- love.graphics.setColor(0, 0, 0)
 	-- love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
@@ -231,6 +293,7 @@ end
 
 function Game:leave()
 	UI:removeLayer('hud')
+	print('leaving game')
 end
 
 function Game:serveBall()
@@ -249,7 +312,7 @@ function Game:setLevel(lvl)
 
 	-- setup entities
 	local pw, ph = 140, 14
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 50 - ph / 2, pw, ph)
+	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 80 - ph / 2, pw, ph)
 
 	self.balls = {}
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)
@@ -267,13 +330,19 @@ function Game:setLevel(lvl)
 			self.score = self.score - 20
 			if #self.balls == 0 then
 				self.lives = self.lives - 1
-
 				if self.lives <= 0 then
 					GameState.switch(GAME_SCENES.gameOver)
 				else
 					self:serveBall()
 				end
+
+				Shack:setShake(15)
+				Shack:setRotation(.1)
+				self.sfx.fail:play()
 			end
+		end,
+		function(brick, index)
+			GameState.switch(GAME_SCENES.gameOver)
 		end,
 		function(drop, index)
 			table.remove(DROPS, index)
@@ -284,6 +353,7 @@ function Game:setLevel(lvl)
 	else
 		self.bricks = self:generateBricks(levels[lvl])
 	end
+	self:setSuddenDeathTimer()
 end
 
 --- generate the bricks for the provided level
@@ -320,22 +390,22 @@ function Game:generateRandomBricks()
 	local rows = {
 		'bbbbbbb',
 		'bbxxxbb',
-		'bbbpbbb',
-		'pbbpbbp',
+		'bbbdbbb',
+		'dbbdbbd',
 		'hhhhhhh',
 		'hbhbhbh',
 		'xxxxxxx',
 		'bbxxxbb',
-		'bpxxxpb',
+		'bdxxxdb',
 		'hbxxxhb',
 		'xhbbbhx',
 		'xxeeexx',
 		'eeeeeee',
 		'heheheh',
 		'xheeehx',
-		'hphhhph',
+		'hdhhhdh',
 		'xxbbbxx',
-		'bpbpbpb',
+		'bdbdbdb',
 	}
 	local noLines = 3 + math.floor(love.math.random(4))
 	local level = {}
@@ -343,6 +413,45 @@ function Game:generateRandomBricks()
 		table.insert(level, Utils.rndTablePick(rows))
 	end
 	return self:generateBricks(level)
+end
+
+function Game:setSuddenDeathTimer()
+	-- clear step timer
+	if self.stepTimer then
+		Timer.clear(self.stepTimer)
+		self.stepTimer = nil
+	end
+	self.suddenDeath = false
+	self.suddenDeathTimer = Timer.after(120, function()
+		self.suddenDeath = true
+		self.cardManager:addCard('SUDDEN DEATH', 1, PALETTE.red_1, true)
+		self.stepTimer = Timer.every(1, function()
+			if GameState.current() == GAME_SCENES.game then
+				for i, brick in ipairs(self.bricks) do
+					brick.pos.y = brick.pos.y + 10
+				end
+			end
+		end, 100)
+	end)
+end
+
+function Game:loadSFX()
+	self.sfx = {
+		bounce_0 = love.audio.newSource('assets/sfx/bounce_0.wav', 'static'),
+		bounce_1 = love.audio.newSource('assets/sfx/bounce_1.wav', 'static'),
+		bounce_2 = love.audio.newSource('assets/sfx/bounce_2.wav', 'static'),
+		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
+		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
+		powerup = love.audio.newSource('assets/sfx/powerup.wav', 'static'),
+	}
+end
+
+function Game:leave()
+	-- clear step timer
+	if self.stepTimer then
+		Timer.clear(self.stepTimer)
+		self.stepTimer = nil
+	end
 end
 
 return Game

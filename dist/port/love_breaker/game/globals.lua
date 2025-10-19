@@ -11,6 +11,7 @@ Push = require 'libs.push'
 Baton = require 'libs.baton'
 Flux = require 'libs.flux'
 Utils = require 'libs.utils'
+Shack = require 'libs.shack'
 
 local initLuis = require 'luis.init'
 Luis = initLuis("luis/widgets")
@@ -77,6 +78,11 @@ GAME_SCENES = {
 	game = require 'scenes.game',
 	gameOver = require 'scenes.gameOver',
 	pause = require 'scenes.pause',
+}
+
+SHADERS = {
+	BlurShader = love.graphics.newShader('shaders/gausianBlur.fs'),
+	PerspectiveShader = love.graphics.newShader('shaders/perspective.fs', 'shaders/perspective.vs')
 }
 
 TIME = 0

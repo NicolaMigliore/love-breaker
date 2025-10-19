@@ -28,6 +28,8 @@ end
 ---@return boolean hasCollision if the ball had any collisions
 ---@return Vector position current position of the ball
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
+---@return boolean hitBrick if the ball hit a brick
+---@return boolean hitPaddle if the ball hit the paddle
 function Ball:update(dt, paddle, bricks)
 	local normVelocity = self.vel:normalized()
 
@@ -38,7 +40,6 @@ function Ball:update(dt, paddle, bricks)
 		local trailPos = self.pos - normVelocity * 10
 		self.trail:setPosition(trailPos.x, trailPos.y)
 		local cur_angle = Utils.round(math.atan2(self.vel.y, self.vel.x), 4)
-		-- print(Inspect(cur_angle))
 		self.trail:setDirection(cur_angle - math.pi)
 	end
 
@@ -52,12 +53,14 @@ function Ball:update(dt, paddle, bricks)
 	collisionResponse = collisionResponse + self:boundsCollision()
 
 	-- check paddle collisions
-	collisionResponse = collisionResponse + self:paddleCollision(paddle)
+	local paddleResponse, hitPaddle = self:paddleCollision(paddle)
+	collisionResponse = collisionResponse + paddleResponse
 
 	-- check bricks collision
-	collisionResponse = collisionResponse + self:brickCollision(bricks)
+	local brickResponse, hitBrick = self:brickCollision(bricks)
+	collisionResponse = collisionResponse + brickResponse
 
-	return self.collision, self.pos, collisionResponse
+	return self.collision, self.pos, collisionResponse, hitBrick, hitPaddle
 end
 
 -- MARK: draw
@@ -97,29 +100,29 @@ end
 --- Run collision checks with game bounds
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
 function Ball:boundsCollision()
-	local maxX = FIXED_WIDTH
-	local maxY = FIXED_HEIGHT
+	local minX, maxX = 10, FIXED_WIDTH - 10
+	local minY, maxY = 10, FIXED_HEIGHT
 	local responseVector = Vector(0,0)
 
-	local hitRight, hitLeft = (self.pos.x + self.rad > maxX), (self.pos.x - self.rad < 0)
+	local hitRight, hitLeft = (self.pos.x + self.rad > maxX), (self.pos.x - self.rad < minX)
 	local invertX = hitRight or hitLeft
 	if hitRight then responseVector = Vector(-1, 0) end
 	if hitLeft then responseVector = Vector(1, 0) end
 	if invertX then
 		self.vel.x = -self.vel.x
-		self.pos.x = Utils.mid(0 + self.rad, self.pos.x, maxX - self.rad)
+		self.pos.x = Utils.mid(minX + self.rad, self.pos.x, maxX - self.rad)
 		self.collisionX = .1
 		self.collision = true
 		return responseVector
 	end
 
-	local hitTop, hitBottom = (self.pos.y - self.rad < 0), (self.pos.y + self.rad > maxY)
+	local hitTop, hitBottom = (self.pos.y - self.rad < minY), (self.pos.y + self.rad > maxY)
 	local invertY = hitTop or hitBottom
 	if hitTop then responseVector = Vector(0, 1) end
 	if hitBottom then responseVector = Vector(0, -1) end
 	if invertY then
 		self.vel.y = -self.vel.y
-		self.pos.y = Utils.mid(0 + self.rad, self.pos.y, maxY - self.rad)
+		self.pos.y = Utils.mid(minY + self.rad, self.pos.y, maxY - self.rad)
 		self.collisionY = .1
 		self.collision = true
 		return responseVector
@@ -130,6 +133,7 @@ end
 --- Run collision checks with the paddle and deflect the ball if necessary.
 ---@param paddle Paddle The paddle to check
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
+---@return boolean hasCollision if the ball has collision with the paddle
 function Ball:paddleCollision(paddle)
 	local paddleCollision, responseVector = Utils.collisionCircRect(
 		self.pos.x,
@@ -172,14 +176,15 @@ function Ball:paddleCollision(paddle)
 				self.vel = self.vel:rotated(dir * math.pi / 12)
 			end
 		end
-		return responseVector
+		return responseVector, true
 	end
-	return Vector(0, 0)
+	return Vector(0, 0), false
 end
 
 --- Run collision checks with the bricks and deflect the ball if necessary.
 ---@param bricks Table<Brick> List of bricks to check
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
+---@return boolean hasCollision if the ball has collision with a brick
 function Ball:brickCollision(bricks)
 	for i, brick in ipairs(bricks) do
 		if not brick.collision then
@@ -214,11 +219,11 @@ function Ball:brickCollision(bricks)
 				end
 				brick:collide(-responseVector, bricks)
 
-				return responseVector
+				return responseVector, true
 			end
 		end
 	end
-	return Vector(0, 0)
+	return Vector(0, 0), false
 end
 
 function Ball:getQuads()
