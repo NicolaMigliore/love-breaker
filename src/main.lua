@@ -1,13 +1,24 @@
 require 'globals'
-DEBUG = false
+local Audio = require 'audio'
 local UIClass = require 'ui'
 UI = nil
+
+local secondTimer = 0
+local frames = 0
+local fps = 0
+local function drawFrames()
+	if GAME_SETTINGS.debugMode then
+		love.graphics.setCanvas(CANVAS.basic)
+		love.graphics.print("FPS: " .. tostring(fps), GAME_SETTINGS.fixedWidth - 95, 15)
+		love.graphics.setCanvas()
+	end
+end
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
 	-- camera setup
-	local gameWidth, gameHeight = FIXED_WIDTH, FIXED_HEIGHT --fixed game resolution
+	local gameWidth, gameHeight = GAME_SETTINGS.fixedWidth, GAME_SETTINGS.fixedHeight --fixed game resolution
 	local windowWidth, windowHeight = 720, 720           --love.window.getDesktopDimensions()
 	Push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight,
 		{ fullscreen = false, resizable = true, pixelperfect = true })
@@ -15,6 +26,10 @@ function love.load()
 
 	-- load shader effects
 	loadEffects(windowWidth, windowHeight)
+
+	-- load audio files
+	AUDIO = Audio()
+	AUDIO:loadSfx()
 
 	-- UI setup
 	UI = UIClass(windowWidth, windowHeight)
@@ -47,21 +62,37 @@ function love.update(dt)
 	Shack:update(dt)
 	INPUT:update()
 
-	if INPUT:pressed('debug') then DEBUG = not DEBUG end
+	if INPUT:pressed('debug') then GAME_SETTINGS.debugMode = not GAME_SETTINGS.debugMode end
+
+	-- calculate fps
+	secondTimer = secondTimer + dt
+	frames = frames + 1
+	if secondTimer >= 1 then
+		fps = frames
+		secondTimer = secondTimer - 1
+		frames = 0
+	end
+		
 end
 
 function love.draw()
+	-- reset font
+	love.graphics.setFont(FONTS.robotic)
+
 	Shack:apply()
 	UI:draw()
+	drawFrames()
 
 	love.graphics.setColor(1, 1, 1, 1)
 	-- draw basic canvas
 	love.graphics.draw(CANVAS.basic, 0, 0)
 	-- draw effect canvas
-	EFFECT(function()
-		love.graphics.draw(CANVAS.effects, 0, 0)
-	end)
-
+	if GAME_SETTINGS.enableShaders then
+		EFFECT(function()
+			love.graphics.draw(CANVAS.effects, 0, 0)
+		end)
+	end
+	
 	-- clear canvases
 	for name, canvas in pairs(CANVAS) do
 		love.graphics.setCanvas(canvas)

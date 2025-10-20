@@ -11,8 +11,8 @@ function Card:new(msg, time, color, clearTimer)
 	self.text = love.graphics.newText(FONTS.robotic, { textColor, self.msg })
 	-- self.text = love.graphics.newText(FONTS.robotic, { { 1, 1, 1, 1 }, self.msg })
 
-	self.pos = Vector(FIXED_WIDTH / 2, FIXED_HEIGHT / 2)
-	self.w = FIXED_WIDTH - 120
+	self.pos = Vector(GAME_SETTINGS.fixedWidth / 2, GAME_SETTINGS.fixedHeight / 2)
+	self.w = GAME_SETTINGS.fixedWidth - 120
 	self.h = 100
 	self.maxW, self.maxH = self.w, self.h
 
@@ -35,7 +35,7 @@ function Card:draw()
 	-- text
 	if self.showText then
 		local textW, textH = self.text:getWidth(), self.text:getHeight()
-		local textX, textY = FIXED_WIDTH / 2 - textW / 2, FIXED_HEIGHT / 2 - textH / 2
+		local textX, textY = GAME_SETTINGS.fixedWidth / 2 - textW / 2, GAME_SETTINGS.fixedHeight / 2 - textH / 2
 		love.graphics.draw(self.text, textX, textY)
 	end
 end
@@ -49,7 +49,7 @@ function Card:open()
 
 	local animTime = .1
 	Timer.tween(animTime, self, { w = self.maxW, h = self.maxH }, 'linear', afterOpen)
-	Timer.tween(animTime, self.pos, { x = FIXED_WIDTH / 2 - self.maxW / 2, y = FIXED_HEIGHT / 2 - self.maxH / 2 }, 'linear')
+	Timer.tween(animTime, self.pos, { x = GAME_SETTINGS.fixedWidth / 2 - self.maxW / 2, y = GAME_SETTINGS.fixedHeight / 2 - self.maxH / 2 }, 'linear')
 end
 
 return Card

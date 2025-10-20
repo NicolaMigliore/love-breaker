@@ -41,9 +41,12 @@ function Pause:getContainer()
 	local bCol = (cw / 2) - (bw / 2) + 1
 	local b_resume = UI:newButton('main', 'RESUME', bw, bh, decorator, nil, function() GameState.pop() end)
 	c_main:addChild(b_resume, 8, bCol)
-	
+
+	local b_settings = UI:newButton('main', 'SETTINGS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.settingsMenu) end)
+	c_main:addChild(b_settings, 11, bCol)
+
 	local b_title = UI:newButton('main', 'QUIT', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.title) end)
-	c_main:addChild(b_title, 11, bCol)
+	c_main:addChild(b_title, 14, bCol)
 
 	UI:animateContainer(c_main, .2)
 end

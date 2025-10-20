@@ -40,7 +40,7 @@ function Brick:draw(style)
 	local w, h = self.w, self.h
 	local styleQuads = self.quads[style]
 
-	if DEBUG then love.graphics.rectangle('line', x, y, w, h) end
+	if GAME_SETTINGS.debugMode then love.graphics.rectangle('line', x, y, w, h) end
 	if style == STYLES.textured or style == STYLES.neon then
 		if self.collision then love.graphics.setColor(.6, .2, .5) end
 		local quadW, quadH, quad = styleQuads.w, styleQuads.h, styleQuads[self.type]

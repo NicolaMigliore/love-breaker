@@ -11,11 +11,12 @@ function UI:new(windowWidth, windowHeight)
 
 	-- load sfx
 	self.sfx = {
-		click = love.audio.newSource('assets/sfx/click.wav', 'static'),
-		slide = love.audio.newSource('assets/sfx/slide_open.wav', 'static'),
+		click = AUDIO.sfx.click,
+		slide = AUDIO.sfx.slide,
 	}
 
 	self.canvas = love.graphics.newCanvas(windowWidth, windowHeight)
+	self.isDebug = GAME_SETTINGS.debugMode
 end
 
 function UI:update(dt)
@@ -27,14 +28,15 @@ function UI:update(dt)
 	Luis.updateScale()
 	Luis.update(dt)
 
-	
+
 	-- handle inputs from controller
 	if INPUT:pressed('action1') then Luis.gamepadpressed(INPUT.joystick, 'a') end
 	if INPUT:released('action1') then Luis.gamepadreleased(INPUT.joystick, 'a') end
-	if INPUT:released('debug') then
-		Luis.showGrid = not Luis.showGrid
-		Luis.showLayerNames = not Luis.showLayerNames
-		Luis.showElementOutlines = not Luis.showElementOutlines
+	if self.isDebug ~= GAME_SETTINGS.debugMode then
+		self.isDebug = GAME_SETTINGS.debugMode
+		Luis.showGrid = self.isDebug
+		Luis.showLayerNames = self.isDebug
+		Luis.showElementOutlines = self.isDebug
 	end
 
 	if INPUT:pressed('down') then
@@ -45,7 +47,11 @@ function UI:update(dt)
 end
 
 function UI:draw()
-	love.graphics.setCanvas(CANVAS.effects)
+	local canvas = CANVAS.basic
+	if GAME_SETTINGS.enableShaders then
+		canvas = CANVAS.effects
+	end
+	love.graphics.setCanvas(canvas)
 	Luis:draw()
 
 	-- reset canvas
@@ -203,6 +209,18 @@ function UI:newLabel(layerName, text, w, h, align, customTheme)
 	local label = Luis.createElement(layerName, 'Label', text, w, h, 1, 1, align, customTheme)
 
 	return label
+end
+
+-- MARK: Checkbox
+function UI:newCheckBox(layerName, value, onChange)
+	local checkBox = Luis.createElement(layerName, 'CheckBox', value, 1, onChange, 1, 1, THEMES.basic.checkbox)
+	return checkBox
+end
+
+-- MARKER: Slider
+function UI:newSlider(layerName, min, max, value, w, h, onChange)
+	local slider = Luis.createElement(layerName, 'Slider', min, max, value, w, h, onChange, 1, 1, THEMES.basic.slider)
+	return slider
 end
 
 return UI

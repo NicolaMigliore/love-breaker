@@ -38,7 +38,7 @@ function Particles:draw()
 	for i,p in ipairs(self.list) do
 		local x, y = p:getPosition()
 		love.graphics.draw(p)
-		if DEBUG then
+		if GAME_SETTINGS.debugMode then
 			love.graphics.setColor(1, 0, 0, 1)
 			love.graphics.circle('fill', x, y, 10)
 		end

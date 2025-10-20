@@ -13,18 +13,19 @@ Flux = require 'libs.flux'
 Utils = require 'libs.utils'
 Shack = require 'libs.shack'
 Moonshine = require 'libs.moonshine'
+Json = require 'libs.json'
 
 local initLuis = require 'luis.init'
 Luis = initLuis("luis/widgets")
 Luis.flux = require("luis.3rdparty.flux")
 
 -- Settings
-SCALE = 2
-FIXED_WIDTH = 360 * SCALE
-FIXED_HEIGHT = 360 * SCALE
+local Settings = require 'settings'
+GAME_SETTINGS = Settings(360, 360, 2)
+GAME_SETTINGS:loadSettings()
 
 -- Fonts
-local fontScale = 7 * SCALE
+local fontScale = 7 * GAME_SETTINGS.scale
 local default = love.graphics.getFont()
 local pixelated = love.graphics.newFont(fontScale, "mono")
 pixelated:setFilter("nearest")
@@ -33,7 +34,6 @@ love.graphics.setFont(pixelated)
 FONTS = {
 	default = default,
 	pixelated = pixelated,
-	-- C:\Users\Nick\Documents\MyProjects\love-breaker\assets\fonts\Robotic_Rancor.ttf
 	robotic = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf', fontScale),
 	robotic_l = love.graphics.newFont('assets/fonts/Robotic_Rancor.ttf', fontScale * 2),
 }
@@ -79,11 +79,12 @@ GAME_SCENES = {
 	game = require 'scenes.game',
 	gameOver = require 'scenes.gameOver',
 	pause = require 'scenes.pause',
+	settingsMenu = require 'scenes.settingsMenu',
 }
 
 CANVAS = {
-	basic = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT),
-	effects = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT),
+	basic = love.graphics.newCanvas(GAME_SETTINGS.fixedWidth, GAME_SETTINGS.fixedHeight),
+	effects = love.graphics.newCanvas(GAME_SETTINGS.fixedWidth, GAME_SETTINGS.fixedHeight),
 }
 
 TIME = 0

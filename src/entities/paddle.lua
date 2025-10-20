@@ -23,7 +23,7 @@ function Paddle:update(dt)
 	self.pos = self.pos + self.vel
 
 	-- check bounds
-	local minX, maxX = 10, FIXED_WIDTH - 10
+	local minX, maxX = 10, GAME_SETTINGS.fixedWidth - 10
 	if self.pos.x < minX then self.pos.x = minX end
 	if self.pos.x + self.w > maxX then self.pos.x = maxX - self.w end
 end

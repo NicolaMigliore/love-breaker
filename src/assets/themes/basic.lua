@@ -26,7 +26,7 @@ local basicTheme = {
 	slider = {
 		trackColor = { 0.4, 0.4, 0.4 },
 		knobColor = { 0.6, 0.6, 0.6 },
-		grabColor = { 0.8, 0.8, 0.8 },
+		grabColor = PALETTE.orange_2,
 		knobRadius = 10,
 	},
 	switch = {
@@ -35,8 +35,8 @@ local basicTheme = {
 		knobColor = { 1, 1, 1 },
 	},
 	checkbox = {
-		boxColor = { 0.4, 0.4, 0.4 },
-		checkColor = { 0, 0.7, 0 },
+		boxColor = PALETTE.grey,
+		checkColor = PALETTE.orange_2,
 		cornerRadius = 4,
 	},
 	radiobutton = {
