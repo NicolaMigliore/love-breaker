@@ -45,6 +45,8 @@ function Title:createUI()
 	c_main:addChild(b_endless, 11, bCol)
 	local b_settings = UI:newButton('titleMain', 'SETTINGS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.settingsMenu) end)
 	c_main:addChild(b_settings, 14, bCol)
+	local b_settings = UI:newButton('titleMain', 'EXIT', bw, bh, decorator, nil, function() love.event.quit() end)
+	c_main:addChild(b_settings, 17, bCol)
 
 	UI:animateContainer(c_main, .2)
 end
