@@ -1,12 +1,12 @@
 local Settings = Object:extend()
 
 function Settings:new(baseWidth, basedHeight, scale)
-	self.scale = scale -- SCALE
+	self.scale = scale               -- SCALE
 	self.fixedWidth = 360 * self.scale -- FIXED_WIDTH
 	self.fixedHeight = 360 * self.scale -- FIXED_HEIGHT
 
 	self.debugMode = false
-	self.enableShaders = true
+	self.enableShaders = false
 
 	self.volumeSfx = 1
 end

@@ -99,6 +99,10 @@ function love.draw()
 		love.graphics.clear(PALETTE.black)
 	end
 	love.graphics.setCanvas()
+
+	if DEBUG_MSG ~= nil then
+		love.graphics.print(DEBUG_MSG, 10, 10)
+	end
 end
 
 function love.resize(w, h)

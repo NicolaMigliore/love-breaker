@@ -19,6 +19,7 @@ local initLuis = require 'luis.init'
 Luis = initLuis("luis/widgets")
 Luis.flux = require("luis.3rdparty.flux")
 
+DEBUG_MSG = ''
 -- Settings
 local Settings = require 'settings'
 GAME_SETTINGS = Settings(360, 360, 2)
