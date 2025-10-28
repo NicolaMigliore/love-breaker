@@ -31,7 +31,7 @@ function TriggerRect:update(dt, balls, bricks, drops)
 end
 
 function TriggerRect:draw()
-	if DEBUG then
+	if GAME_SETTINGS.debugMode then
 		love.graphics.setColor(1, 1, 1, .75)
 		love.graphics.rectangle('line', self.pos.x, self.pos.y, self.w, self.h)
 		love.graphics.setColor(1, 1, 1, 1)

@@ -42,39 +42,12 @@ function Game:enter(previous, endless)
 	self:setLevel(self.curLevel)
 
 	-- setup UI
-	if UI:layerExists('hud') then
-		UI:removeLayer('hud')
-	end
-	local hudLayer = UI:newLayer('hud')
-	local maxCol = UI:getMaxCol()
-	local maxRow = UI:getMaxRow()
-
-	local containerTheme = Lume.clone(UI:getTheme().container)
-	containerTheme.backgroundColor = PALETTE.orange_2
-	containerTheme.borderColor = PALETTE.orange_2
-	local c_hud = UI:newContainer('hud', maxCol, 2, maxRow - 1, 1, nil, containerTheme, 'hudContainer')
-
-	local labelTheme = Lume.clone(UI:getTheme().text)
-	labelTheme.color = PALETTE.black
-	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_combo, 1, maxCol - 26)
-	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_lives, 1, maxCol - 17)
-	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_score, 1, maxCol - 8)
-
-	self.layers.hud = {
-		layerName = 'hud',
-		layer = hudLayer,
-		containers = {
-			c_hud = c_hud
-		}
-	}
+	self:createUI()
 
 	-- load sound FXs
 	self:loadSFX()
 
-	self.canvas = love.graphics.newCanvas(FIXED_WIDTH, FIXED_HEIGHT)
+	self.canvas = love.graphics.newCanvas(GAME_SETTINGS.fixedWidth, GAME_SETTINGS.fixedheight)
 
 	self:setSuddenDeathTimer()
 end
@@ -218,25 +191,26 @@ function Game:update(dt)
 	PARTICLES:update(dt)
 
 	-- update hud
-	local hudContainer = self.layers.hud.containers.c_hud
-	local labels = hudContainer.children
-	labels[1]:setText('COMBO '..self.combo)
-	labels[2]:setText('LIVES '..self.lives)
-	labels[3]:setText('SCORE '..self.score)
+	if self.layers.hud then
+		local hudContainer = self.layers.hud.containers.c_hud
+		local labels = hudContainer.children
+		labels[1]:setText('COMBO '..self.combo)
+		labels[2]:setText('LIVES '..self.lives)
+		labels[3]:setText('SCORE '..self.score)
+	end
 end
 
 -- MARK: Draw
 function Game:draw()
-	-- Push:start()
-
-	love.graphics.setCanvas(self.canvas)
-	love.graphics.clear()
+	local canvas = CANVAS.basic
+	if GAME_SETTINGS.enableShaders then
+		canvas = CANVAS.effects
+	end
+	love.graphics.setCanvas(canvas)
 
 	-- draw frame
 	love.graphics.setColor(PALETTE.orange_2)
-	love.graphics.rectangle('line', 10, 10, FIXED_WIDTH - 20, FIXED_HEIGHT - 60, 5)
-
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle('line', 10, 10, GAME_SETTINGS.fixedWidth - 20, GAME_SETTINGS.fixedHeight - 60, 5)
 
 	if self.isServing then
 		local nextBall = self.balls[#self.balls]
@@ -264,31 +238,10 @@ function Game:draw()
 	self.gameOverTrigger:draw()
 	PARTICLES:draw()
 
-	-- reset canvas
-	love.graphics.setCanvas()
-
-	-- draw with blur shader
-	love.graphics.setShader(SHADERS.BlurShader)
-	love.graphics.draw(self.canvas, 0, 0)
-
-	-- draw with default shader
-	love.graphics.setShader()
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(self.canvas, 0, 0)
-
 	self.cardManager:draw()
 
-	-- UI
-	-- love.graphics.setColor(0, 0, 0)
-	-- love.graphics.rectangle('fill', 0, FIXED_HEIGHT - 35, FIXED_WIDTH, 20 * SCALE)
-	-- love.graphics.setColor(1, 1, 1)
-
-	-- Utils.printLabel('LIVES: ' .. self.lives .. '   SCORE: ' .. self.score, FIXED_WIDTH - 5, FIXED_HEIGHT - 15,
-	-- 	ALIGNMENTS.right)
-
-	-- Utils.printLabel(love.timer.getFPS() .. 'fps', 10, 20, ALIGNMENTS.left)
-
-	-- Push:finish()
+	-- reset canvas
+	love.graphics.setCanvas()
 end
 
 function Game:leave()
@@ -312,14 +265,14 @@ function Game:setLevel(lvl)
 
 	-- setup entities
 	local pw, ph = 140, 14
-	self.paddle = Paddle(FIXED_WIDTH / 2 - pw / 2, FIXED_HEIGHT - 80 - ph / 2, pw, ph)
+	self.paddle = Paddle(GAME_SETTINGS.fixedWidth / 2 - pw / 2, GAME_SETTINGS.fixedHeight - 80 - ph / 2, pw, ph)
 
 	self.balls = {}
 	local nextPos = Vector(self.paddle.pos.x + self.paddle.w / 2, self.paddle.pos.y - self.ballRad - 1)
 	table.insert(self.balls, Ball(nextPos.x, nextPos.y, self.ballRad))
 
 
-	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + self.ballRad * 2, FIXED_WIDTH, 100,
+	self.gameOverTrigger = TriggerRect(0, self.paddle.pos.y + self.paddle.h + self.ballRad * 2, GAME_SETTINGS.fixedWidth, 100,
 		function(ball, index)
 			if index then
 				local particleIndex = Lume.find(PARTICLES.list, ball.trail)
@@ -437,12 +390,12 @@ end
 
 function Game:loadSFX()
 	self.sfx = {
-		bounce_0 = love.audio.newSource('assets/sfx/bounce_0.wav', 'static'),
-		bounce_1 = love.audio.newSource('assets/sfx/bounce_1.wav', 'static'),
-		bounce_2 = love.audio.newSource('assets/sfx/bounce_2.wav', 'static'),
-		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
-		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
-		powerup = love.audio.newSource('assets/sfx/powerup.wav', 'static'),
+		bounce_0 = AUDIO.sfx.bounce_0,
+		bounce_1 = AUDIO.sfx.bounce_1,
+		bounce_2 = AUDIO.sfx.bounce_2,
+		bounce_3 = AUDIO.sfx.bounce_3,
+		fail = AUDIO.sfx.fail,
+		powerup = AUDIO.sfx.powerup,
 	}
 end
 
@@ -453,5 +406,38 @@ function Game:leave()
 		self.stepTimer = nil
 	end
 end
+
+-- MARK: Setup UI
+function Game:createUI()
+	if UI:layerExists('hud') then
+		UI:removeLayer('hud')
+	end
+	local hudLayer = UI:newLayer('hud')
+	local maxCol = UI:getMaxCol()
+	local maxRow = UI:getMaxRow()
+
+	local containerTheme = Lume.clone(UI:getTheme().container)
+	containerTheme.backgroundColor = PALETTE.orange_3
+	containerTheme.borderColor = PALETTE.orange_3
+	local c_hud = UI:newContainer('hud', maxCol, 2, maxRow - 1, 1, nil, containerTheme, 'hudContainer')
+
+	local labelTheme = Lume.clone(UI:getTheme().text)
+	labelTheme.color = PALETTE.black
+	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_combo, 1, maxCol - 26)
+	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_lives, 1, maxCol - 17)
+	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
+	c_hud:addChild(l_score, 1, maxCol - 8)
+
+	self.layers.hud = {
+		layerName = 'hud',
+		layer = hudLayer,
+		containers = {
+			c_hud = c_hud
+		}
+	}
+end
+
 
 return Game

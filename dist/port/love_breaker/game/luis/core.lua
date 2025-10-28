@@ -603,7 +603,6 @@ end
 function luis.draw()
     love.graphics.push()
     love.graphics.scale(luis.scale, luis.scale)
-    love.graphics.setBackgroundColor(luis.theme.background.color)
 
     -- Create a flat list of all elements from enabled layers
     local allElements = {}

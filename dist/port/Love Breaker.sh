@@ -27,11 +27,13 @@ cd $GAMEDIR
 > "$GAMEDIR/log.txt" && exec > >(tee "$GAMEDIR/log.txt") 2>&1
 
 # Set the XDG environment variables for config & savefiles
-export XDG_DATA_HOME="$CONFDIR"
+# export XDG_DATA_HOME="$CONFDIR"
+export XDG_DATA_HOME="/storage/love_breaker"
 
 #  If XDG Path does not work
 # Use bind_directories to reroute that to a location within the ports folder.
-bind_directories ~/.love_breaker $GAMEDIR/conf/.love_breaker 
+# bind_directories ~/.love_breaker $GAMEDIR/conf/.love_breaker 
+bind_directories ~/.love_breaker /storage/love_breaker
 
 # export LD_LIBRARY_PATH="$GAMEDIR/libs.${DEVICE_ARCH}:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="$GAMEDIR/libs:$LD_LIBRARY_PATH"

@@ -7,26 +7,25 @@ function Title:enter()
 end
 
 function Title:update(dt)
-
 end
 
 function Title:draw()
 end
 
 function Title:leave()
-	UI:removeLayer('main')
+	UI:removeLayer('titleMain')
 end
 
 function Title:createUI()
 	-- UI - create main layer
-	self.layers.main = UI:newLayer('main')
+	self.layers.main = UI:newLayer('titleMain')
 
 	local decorator = THEMES.basic.decorator
 
 	local maxCol = UI:getMaxCol()
 	local cw, ch = 24, 22
 	local cCol = (maxCol / 2) - (cw / 2) + 1
-	local c_main = UI:newContainer('main', cw, ch, 8, cCol, decorator, nil, 'mainContainer')
+	local c_main = UI:newContainer('titleMain', cw, ch, 8, cCol, decorator, nil, 'mainContainer')
 
 	local lw, lh = cw - 2, 3
 	local lCol = (cw / 2) - (lw / 2) + 1
@@ -35,15 +34,19 @@ function Title:createUI()
 		font = FONTS.robotic_l,
 		align = 'center',
 	}
-	local l_title = UI:newLabel('main', 'LOVE-BREAKER', lw, lh, ALIGNMENTS.center, customTheme)
+	local l_title = UI:newLabel('titleMain', 'LOVE-BREAKER', lw, lh, ALIGNMENTS.center, customTheme)
 	c_main:addChild(l_title, 2, lCol)
 
 	local bw, bh = 8, 2
 	local bCol = (cw / 2) - (bw / 2) + 1
-	local b_start = UI:newButton('main', 'CLASSIC', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, false) end)
+	local b_start = UI:newButton('titleMain', 'CLASSIC', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, false) end)
 	c_main:addChild(b_start, 8, bCol)
-	local b_start = UI:newButton('main', 'ENDLESS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, true) end)
-	c_main:addChild(b_start, 11, bCol)
+	local b_endless = UI:newButton('titleMain', 'ENDLESS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, true) end)
+	c_main:addChild(b_endless, 11, bCol)
+	local b_settings = UI:newButton('titleMain', 'SETTINGS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.settingsMenu) end)
+	c_main:addChild(b_settings, 14, bCol)
+	local b_settings = UI:newButton('titleMain', 'EXIT', bw, bh, decorator, nil, function() love.event.quit() end)
+	c_main:addChild(b_settings, 17, bCol)
 
 	UI:animateContainer(c_main, .2)
 end

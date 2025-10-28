@@ -67,12 +67,7 @@ end
 function Ball:draw(style)
 	love.graphics.setColor(1, 1, 1)
 
-	if DEBUG then love.graphics.circle('line', self.pos.x, self.pos.y, self.rad) end
-
-	-- -- draw particles
-	-- for i, tp in ipairs(self.trail) do
-	--     love.graphics.circle('fill', tp.x, tp.y, (self.rad-2) *(i/self.trailMax))
-	-- end
+	if GAME_SETTINGS.debugMode then love.graphics.circle('line', self.pos.x, self.pos.y, self.rad) end
 
 	if style == STYLES.basic then
 		love.graphics.rectangle('fill', (self.pos.x - self.rad), (self.pos.y - self.rad), (self.rad * 2), (self.rad * 2))
@@ -100,8 +95,8 @@ end
 --- Run collision checks with game bounds
 ---@return Vector collisionResponse the normalized response vector for the collision or Vector(0,0) if no collision happened
 function Ball:boundsCollision()
-	local minX, maxX = 10, FIXED_WIDTH - 10
-	local minY, maxY = 10, FIXED_HEIGHT
+	local minX, maxX = 10, GAME_SETTINGS.fixedWidth - 10
+	local minY, maxY = 10, GAME_SETTINGS.fixedHeight
 	local responseVector = Vector(0,0)
 
 	local hitRight, hitLeft = (self.pos.x + self.rad > maxX), (self.pos.x - self.rad < minX)
