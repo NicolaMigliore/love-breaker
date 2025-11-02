@@ -120,7 +120,7 @@ function Game:update(dt)
 		if self.curLevel <= #levels then
 			self:setLevel(self.curLevel)
 		else
-			GameState.switch(GAME_SCENES.gameOver)
+			GameState.switch(GAME_SCENES.highScore)
 		end
 	end
 
@@ -185,7 +185,7 @@ function Game:update(dt)
 	self.gameOverTrigger:update(dt, self.balls, self.bricks, DROPS)
 	if #self.bricks == 0 then
 		self.score = self.score + self.lives * 50
-		GameState.switch(GAME_SCENES.gameOver)
+		GameState.switch(GAME_SCENES.highScore)
 	end
 
 	PARTICLES:update(dt)
@@ -284,7 +284,7 @@ function Game:setLevel(lvl)
 			if #self.balls == 0 then
 				self.lives = self.lives - 1
 				if self.lives <= 0 then
-					GameState.switch(GAME_SCENES.gameOver)
+					GameState.switch(GAME_SCENES.highScore)
 				else
 					self:serveBall()
 				end
@@ -295,7 +295,7 @@ function Game:setLevel(lvl)
 			end
 		end,
 		function(brick, index)
-			GameState.switch(GAME_SCENES.gameOver)
+			GameState.switch(GAME_SCENES.highScore)
 		end,
 		function(drop, index)
 			table.remove(DROPS, index)

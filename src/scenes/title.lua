@@ -23,7 +23,7 @@ function Title:createUI()
 	local decorator = THEMES.basic.decorator
 
 	local maxCol = UI:getMaxCol()
-	local cw, ch = 24, 22
+	local cw, ch = 24, 27
 	local cCol = (maxCol / 2) - (cw / 2) + 1
 	local c_main = UI:newContainer('titleMain', cw, ch, 8, cCol, decorator, nil, 'mainContainer')
 
@@ -43,10 +43,12 @@ function Title:createUI()
 	c_main:addChild(b_start, 8, bCol)
 	local b_endless = UI:newButton('titleMain', 'ENDLESS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.game, true) end)
 	c_main:addChild(b_endless, 11, bCol)
-	local b_settings = UI:newButton('titleMain', 'SETTINGS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.settingsMenu) end)
+	local b_settings = UI:newButton('titleMain', 'SCORES', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.highScore, true) end)
 	c_main:addChild(b_settings, 14, bCol)
-	local b_settings = UI:newButton('titleMain', 'EXIT', bw, bh, decorator, nil, function() love.event.quit() end)
+	local b_settings = UI:newButton('titleMain', 'SETTINGS', bw, bh, decorator, nil, function() GameState.switch(GAME_SCENES.settingsMenu) end)
 	c_main:addChild(b_settings, 17, bCol)
+	local b_settings = UI:newButton('titleMain', 'EXIT', bw, bh, decorator, nil, function() love.event.quit() end)
+	c_main:addChild(b_settings, 20, bCol)
 
 	UI:animateContainer(c_main, .2)
 end

@@ -81,6 +81,7 @@ GAME_SCENES = {
 	gameOver = require 'scenes.gameOver',
 	pause = require 'scenes.pause',
 	settingsMenu = require 'scenes.settingsMenu',
+	highScore = require 'scenes.highscore',
 }
 
 CANVAS = {
