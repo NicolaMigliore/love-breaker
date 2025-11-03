@@ -50,6 +50,10 @@ function Title:createUI()
 	local b_settings = UI:newButton('titleMain', 'EXIT', bw, bh, decorator, nil, function() love.event.quit() end)
 	c_main:addChild(b_settings, 20, bCol)
 
+	lw, lh = 5, 1
+	local l_version = UI:newLabel('titleMain', 'v.'..GAME_VERSION, lw, lh, ALIGNMENTS.right)
+	c_main:addChild(l_version, ch - lh + .5, cw - lw + .5)
+
 	UI:animateContainer(c_main, .2)
 end
 

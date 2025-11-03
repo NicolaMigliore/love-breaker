@@ -20,6 +20,8 @@ Luis = initLuis("luis/widgets")
 Luis.flux = require("luis.3rdparty.flux")
 
 DEBUG_MSG = ''
+GAME_VERSION = '0.2.0'
+
 -- Settings
 local Settings = require 'settings'
 GAME_SETTINGS = Settings(360, 360, 2)
