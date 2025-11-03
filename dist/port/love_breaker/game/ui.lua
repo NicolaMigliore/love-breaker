@@ -28,22 +28,7 @@ function UI:update(dt)
 	Luis.updateScale()
 	Luis.update(dt)
 
-
-	-- handle inputs from controller
-	if INPUT:pressed('action1') then Luis.gamepadpressed(INPUT.joystick, 'a') end
-	if INPUT:released('action1') then Luis.gamepadreleased(INPUT.joystick, 'a') end
-	if self.isDebug ~= GAME_SETTINGS.debugMode then
-		self.isDebug = GAME_SETTINGS.debugMode
-		Luis.showGrid = self.isDebug
-		Luis.showLayerNames = self.isDebug
-		Luis.showElementOutlines = self.isDebug
-	end
-
-	if INPUT:pressed('down') then
-		Luis.moveFocus("next")
-	elseif INPUT:pressed('up') then
-		Luis.moveFocus("previous")
-	end
+	self:handleInput()
 end
 
 function UI:draw()
@@ -59,6 +44,46 @@ function UI:draw()
 
 end
 
+function UI:handleInput()
+	-- handle inputs from controller
+	if INPUT:pressed('action1') then Luis.gamepadpressed(INPUT.joystick, 'a') print('test') end
+	if INPUT:released('action1') then Luis.gamepadreleased(INPUT.joystick, 'a') end
+	if self.isDebug ~= GAME_SETTINGS.debugMode then
+		self.isDebug = GAME_SETTINGS.debugMode
+		Luis.showGrid = self.isDebug
+		Luis.showLayerNames = self.isDebug
+		Luis.showElementOutlines = self.isDebug
+	end
+
+	-- handle inputs when focused on PadInput
+	if Luis.currentFocus and Luis.currentFocus.type == 'PadInput' then
+		if INPUT:released('left') then
+			Luis.gamepadreleased(INPUT.joystick, 'left')
+		elseif INPUT:released('right') then
+			Luis.gamepadreleased(INPUT.joystick, 'right')
+		elseif INPUT:pressed('down') then
+			Luis.gamepadpressed(INPUT.joystick, 'down')
+		elseif INPUT:pressed('up') then
+			Luis.gamepadpressed(INPUT.joystick, 'up')
+		elseif INPUT:pressed('action1') or INPUT:pressed('action2') then
+			Luis.gamepadpressed(INPUT.joystick, 'action1')
+		end
+	else
+		-- handle focus change in other cases
+		if INPUT:pressed('down') then
+			Luis.moveFocus("next")
+		elseif INPUT:pressed('up') then
+			Luis.moveFocus("previous")
+		end
+	end
+end
+
+function UI:textinput(text)
+	Luis.textinput(text)
+end
+function UI:keypressed(k)
+	Luis.keypressed(k)
+end
 function UI:mousepressed(x, y, button, istouch)
 	Luis.mousepressed(x, y, button, istouch)
 end
@@ -89,6 +114,10 @@ end
 --- get the currently applied theme
 function UI:getTheme()
 	return Luis.theme
+end
+
+function UI:setCurrentFocus(element)
+	Luis.setCurrentFocus(element)
 end
 
 -- MARK: Layers
@@ -217,10 +246,23 @@ function UI:newCheckBox(layerName, value, onChange)
 	return checkBox
 end
 
--- MARKER: Slider
+-- MARK: Slider
 function UI:newSlider(layerName, min, max, value, w, h, onChange)
 	local slider = Luis.createElement(layerName, 'Slider', min, max, value, w, h, onChange, 1, 1, THEMES.basic.slider)
 	return slider
 end
 
+-- MARK: TextInput
+function UI:newTextInput(layerName, placeholder, w, h, onChange)
+	-- textInput.new(width, height, placeholder, onChange, row, col, customTheme)
+	local input = Luis.createElement(layerName, 'TextInput', w, h, placeholder, onChange, 1, 1, THEMES.basic.textinput)
+	return input
+end
+
+-- MARK: PadInput
+function UI:newPadInput(layerName, w, h, onChange)
+	local nChars = 8
+	local input = Luis.createElement(layerName, "PadInput", 1, 1, w, h, nChars, Utils.padString('', nChars, ' '), onChange)
+	return input
+end
 return UI

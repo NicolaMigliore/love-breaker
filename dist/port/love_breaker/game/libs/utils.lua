@@ -156,4 +156,35 @@ function Utils.rndTablePick(tb)
 	return tb[i]
 end
 
+function Utils.padString(text, n, char, position)
+	if #text >= n then
+		return text
+	end
+
+	char = char or ''
+	local padding = ''
+	for i = 1, n do
+		padding = padding .. char
+	end
+
+	position = position or 'start'
+	if position == 'start' then
+		text = padding .. text
+		text = string.sub(text, -n, -1)
+	elseif position == 'end' then
+		text = text .. padding
+		text = string.sub(text, 1, n)
+	end
+	return text
+end
+
+--- Replace a character in the string
+---@param str string initial string
+---@param pos integer the position of the character to replace
+---@param replace string the new character string to insert
+---@return unknown
+function Utils.replace_char(str, pos, replace)
+	return str:sub(1, pos - 1) .. replace .. str:sub(pos + 1)
+end
+
 return Utils

@@ -65,12 +65,12 @@ local basicTheme = {
 		scrollBarWidth = 10
 	},
 	textinput = {
-		backgroundColor = { 0.2, 0.2, 0.2 },
-		textColor = { 1, 1, 1 },
-		cursorColor = { 1, 1, 1 },
-		selectionColor = { 0.3, 0.7, 1, 0.5 },
-		borderColor = { 0.5, 0.5, 0.5 },
-		borderWidth = 2,
+		backgroundColor = { 0, 0, 0, 0 },
+		textColor = PALETTE.white,
+		cursorColor = PALETTE.white,
+		selectionColor = PALETTE.orange_2,
+		borderColor = PALETTE.white,
+		borderWidth = 1,
 		padding = 5
 	},
 	flexContainer = {

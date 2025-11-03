@@ -46,6 +46,7 @@ function love.load()
 			up = { 'key:up', 'key:w', 'axis:lefty-', 'button:dpup' },
 			down = { 'key:down', 'key:s', 'axis:lefty+', 'button:dpdown' },
 			action1 = { 'key:space', 'button:a' },
+			action2 = { 'button:b' },
 			reload = { 'key:r', 'button:y' },
 			start = { 'key:escape', 'key:insert', 'button:start' },
 			debug = { 'key:tab' },
@@ -110,6 +111,13 @@ function love.resize(w, h)
 	if EFFECT then 
 		EFFECT.resize(w, h)
 	end
+end
+
+function love.textinput(text)
+	UI:textinput(text)
+end
+function love.keypressed(k)
+	UI:keypressed(k)
 end
 
 function love.mousepressed(x, y, button, istouch)
