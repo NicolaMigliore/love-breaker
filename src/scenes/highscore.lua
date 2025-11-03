@@ -11,7 +11,7 @@ function HighScore:enter(previous, isViewMode)
 	self.isViewMode = isViewMode or false
 	self.isEndless = previous.isEndless
 	self.newScore = previous.score or 0
-	self.isAddingScore = not self.scores[7] or self.newScore > self.scores[7].score
+	self.isAddingScore = previous.score and (not self.scores[7] or self.newScore > self.scores[7].score)
 
 	Timer.after(.2, function() self:createUI() end)
 end
