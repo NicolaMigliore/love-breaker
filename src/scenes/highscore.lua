@@ -25,7 +25,7 @@ function HighScore:draw()
 end
 
 function HighScore:leave()
-
+	UI:removeLayer('hs_main')
 end
 
 function HighScore:sortScores()
@@ -59,6 +59,7 @@ function HighScore:createUI()
 	if UI:layerExists(layerName) then
 		UI:removeLayer(layerName)
 	end
+	UI:newLayer(layerName)
 	local decorator = THEMES.basic.decorator
 
 	-- container
