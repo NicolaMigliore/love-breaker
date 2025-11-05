@@ -31,9 +31,21 @@ end
 function Paddle:draw(style)
 	love.graphics.setColor(1, 1, 1, 1)
 	if style == STYLES.textured or style == STYLES.neon then
+		local w, h = self.w, self.h
+		local xOffset, yOffset = 0, 0
+		-- override width and offset based on collision state
+		if self.collision then
+			w = w * 1.1
+			xOffset = (self.w - w) / 2
+			h = h * .8
+			yOffset = (self.h - h) / 2
+		end
+		-- calculate quad, position, and scale
+		local x, y = self.pos.x + xOffset, self.pos.y + yOffset
 		local quadW, quadH, quad = self.quads[style].w, self.quads[style].h, self.quads[style].quad
-		local scaleX, scaleY = self.w / quadW, self.h / quadH
-		love.graphics.draw(self.textures, quad, self.pos.x, self.pos.y, 0, scaleX, scaleY)
+		local scaleX, scaleY = w / quadW, h / quadH
+		
+		love.graphics.draw(self.textures, quad, x, y, 0, scaleX, scaleY)
 	else
 		-- default draw
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
@@ -56,6 +68,13 @@ function Paddle:getQuads()
 			quad = love.graphics.newQuad(0, 7, w, h, self.textures:getWidth(), self.textures:getHeight()),
 		}
 	}
+end
+
+function Paddle:setCollision(hasCollision)
+	self.collision = hasCollision
+	if hasCollision then
+		Timer.after(.1, function() self.collision = false end)
+	end
 end
 
 return Paddle

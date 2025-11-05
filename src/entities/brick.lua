@@ -67,6 +67,9 @@ function Brick:draw(style)
 	end
 end
 
+-- MARK: getQuads
+--- Generate the quads to draw all bricks
+---@return table a table in the for { themeName = quadData }
 function Brick:getQuads()
 	local w, h = 40, 13
 	local textureWidth, textureHeight = self.textures:getWidth(), self.textures:getHeight()

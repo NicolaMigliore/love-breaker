@@ -6,11 +6,13 @@ function Ball:new(x, y, r)
 	self.speed = 0
 	local angle = -math.pi / 4
 	self.vel = Vector.fromPolar(angle, 1) --Vector(1,1)
-	self.collisionTimer = 0
 	self.collision = false
 	self.collisionX = 0
 	self.collisionY = 0
-	self.textures = love.graphics.newImage('assets/textures/ball.png')
+	self.textures = {
+		ball = love.graphics.newImage('assets/textures/ball.png'),
+		bigBall = love.graphics.newImage('assets/textures/bigball.png'),
+	}
 	self.quads = self:getQuads()
 	self.served = false
 
@@ -72,23 +74,24 @@ function Ball:draw(style)
 	if style == STYLES.basic then
 		love.graphics.rectangle('fill', (self.pos.x - self.rad), (self.pos.y - self.rad), (self.rad * 2), (self.rad * 2))
 	elseif style == STYLES.textured or style == STYLES.neon then
-		if self.collisionY > 0 or self.collisionX > 0 then love.graphics.setColor(.6, .6, .6) end
-		-- if self.collisionY > 0 or self.collisionX > 0 then love.graphics.setColor(1,1,1) end
+		local texture = self.textures.ball
 		local quadSize, quadIndex = 12, 1
-		if self.collisionY > 0 then quadIndex = 2 end
-		if self.collisionX > 0 then quadIndex = 3 end
+		if self.collisionY > 0 then quadIndex = 2 love.graphics.setColor(PALETTE.white) end
+		if self.collisionX > 0 then quadIndex = 3 love.graphics.setColor(PALETTE.white) end
+		-- override textures if ball is big
+		if self.rad > 15 then
+			quadSize = 24
+			quadIndex = quadIndex + 3
+			texture = self.textures.bigBall
+		end
 		local quad = self.quads[style][quadIndex]
 		local scale = (self.rad * 2) / quadSize
-		love.graphics.draw(self.textures, quad, (self.pos.x - quadSize * scale / 2), (self.pos.y - quadSize * scale / 2), 0, scale, scale)
+		love.graphics.draw(texture, quad, (self.pos.x - quadSize * scale / 2), (self.pos.y - quadSize * scale / 2), 0, scale, scale)
 	else
 		-- default draw
 		if self.collision then love.graphics.setColor(.6, .2, .2) end
 		love.graphics.circle('fill', self.pos.x, self.pos.y, self.rad)
 	end
-
-	-- love.graphics.setColor(1, 0, 0)
-	-- love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
-	
 	love.graphics.setColor(1, 1, 1)
 end
 
@@ -171,6 +174,10 @@ function Ball:paddleCollision(paddle)
 				self.vel = self.vel:rotated(dir * math.pi / 12)
 			end
 		end
+
+		-- set collision state on paddle
+		paddle:setCollision(true)
+
 		return responseVector, true
 	end
 	return Vector(0, 0), false
@@ -222,16 +229,25 @@ function Ball:brickCollision(bricks)
 end
 
 function Ball:getQuads()
+	local ballTextureW, ballTextureH = self.textures.ball:getWidth(), self.textures.ball:getHeight()
+	local bigBallTextureW, bigBallTextureH = self.textures.bigBall:getWidth(), self.textures.bigBall:getHeight()
+
 	return {
 		textured = {
-			love.graphics.newQuad(0, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(12, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(24, 0, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(0, 0, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(12, 0, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(24, 0, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(0, 0, 24, 24, bigBallTextureW, bigBallTextureH),
+			love.graphics.newQuad(24, 0, 24, 24, bigBallTextureW, bigBallTextureH),
+			love.graphics.newQuad(48, 0, 24, 24, bigBallTextureW, bigBallTextureH),
 		},
 		neon = {
-			love.graphics.newQuad(0, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(12, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
-			love.graphics.newQuad(24, 12, 12, 12, self.textures:getWidth(), self.textures:getHeight()),
+			love.graphics.newQuad(0, 12, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(12, 12, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(24, 12, 12, 12, ballTextureW, ballTextureH),
+			love.graphics.newQuad(0, 24, 24, 24, bigBallTextureW, bigBallTextureH),
+			love.graphics.newQuad(24, 24, 24, 24, bigBallTextureW, bigBallTextureH),
+			love.graphics.newQuad(48, 24, 24, 24, bigBallTextureW, bigBallTextureH),
 		},
 	}
 end
