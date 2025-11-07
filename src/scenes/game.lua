@@ -117,7 +117,7 @@ function Game:update(dt)
 	if #self.bricks == 0 then
 		-- TODO: add transition
 		self.curLevel = self.curLevel + 1
-		if self.curLevel <= #levels then
+		if self.curLevel <= #levels or self.isEndless then
 			self:setLevel(self.curLevel)
 		else
 			GameState.switch(GAME_SCENES.highScore)
@@ -299,8 +299,10 @@ function Game:setLevel(lvl)
 		end,
 		function(drop, index)
 			table.remove(DROPS, index)
-		end)
+		end
+	)
 
+	-- setup bricks
 	if self.isEndless then
 		self.bricks = self:generateRandomBricks()
 	else
@@ -375,6 +377,9 @@ function Game:setSuddenDeathTimer()
 		self.stepTimer = nil
 	end
 	self.suddenDeath = false
+	if self.suddenDeathTimer then
+		Timer.clear(self.suddenDeathTimer)
+	end
 	self.suddenDeathTimer = Timer.after(120, function()
 		self.suddenDeath = true
 		self.cardManager:addCard('SUDDEN DEATH', 1, PALETTE.red_1, true)
