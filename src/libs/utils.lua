@@ -187,4 +187,10 @@ function Utils.replace_char(str, pos, replace)
 	return str:sub(1, pos - 1) .. replace .. str:sub(pos + 1)
 end
 
+function Utils.secondsToTimeString(t)
+	local m = Utils.padString(tostring(math.floor(t / 60)), 2, '0')
+	local s = Utils.padString(tostring(math.floor(t % 60)), 2, '0')
+	return string.format('%s:%s', m, s)
+end
+
 return Utils

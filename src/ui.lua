@@ -46,7 +46,7 @@ end
 
 function UI:handleInput()
 	-- handle inputs from controller
-	if INPUT:pressed('action1') then Luis.gamepadpressed(INPUT.joystick, 'a') print('test') end
+	if INPUT:pressed('action1') then Luis.gamepadpressed(INPUT.joystick, 'a') end
 	if INPUT:released('action1') then Luis.gamepadreleased(INPUT.joystick, 'a') end
 	if self.isDebug ~= GAME_SETTINGS.debugMode then
 		self.isDebug = GAME_SETTINGS.debugMode

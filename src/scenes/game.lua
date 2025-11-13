@@ -124,6 +124,7 @@ function Game:update(dt)
 		end
 	end
 
+	-- update drops
 	for i, drop in ipairs(DROPS) do
 		drop:update(dt)
 
@@ -194,9 +195,11 @@ function Game:update(dt)
 	if self.layers.hud then
 		local hudContainer = self.layers.hud.containers.c_hud
 		local labels = hudContainer.children
-		labels[1]:setText('COMBO '..self.combo)
+		local time = (self.suddenDeathTimer.time > 0.1) and Utils.secondsToTimeString(120 - self.suddenDeathTimer.time) or '00:00'
+		labels[1]:setText('TIME '..time)
 		labels[2]:setText('LIVES '..self.lives)
 		labels[3]:setText('SCORE '..self.score)
+		labels[4]:setText('COMBO '..self.combo)
 	end
 end
 
@@ -283,6 +286,7 @@ function Game:setLevel(lvl)
 			self.score = self.score - 20
 			if #self.balls == 0 then
 				self.lives = self.lives - 1
+				self.combo = 0
 				if self.lives <= 0 then
 					GameState.switch(GAME_SCENES.highScore)
 				else
@@ -426,14 +430,18 @@ function Game:createUI()
 	containerTheme.borderColor = PALETTE.orange_3
 	local c_hud = UI:newContainer('hud', maxCol, 2, maxRow - 1, 1, nil, containerTheme, 'hudContainer')
 
+	local lw = maxCol / 4
 	local labelTheme = Lume.clone(UI:getTheme().text)
 	labelTheme.color = PALETTE.black
-	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_combo, 1, maxCol - 26)
-	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_lives, 1, maxCol - 17)
-	local l_score = UI:newLabel('hud', 'SCORE '..self.score, 8, 2, ALIGNMENTS.right, labelTheme)
-	c_hud:addChild(l_score, 1, maxCol - 8)
+	-- local l_combo = UI:newLabel('hud', 'TIME '..self.suddenDeathTimer.time, lw, 2, ALIGNMENTS.LEFT, labelTheme)
+	local l_combo = UI:newLabel('hud', 'TIME ', lw, 2, ALIGNMENTS.LEFT, labelTheme)
+	c_hud:addChild(l_combo, 1, 2)
+	local l_lives = UI:newLabel('hud', 'LIVES '..self.lives, lw, 2, ALIGNMENTS.LEFT, labelTheme)
+	c_hud:addChild(l_lives, 1, 2 + lw)
+	local l_score = UI:newLabel('hud', 'SCORE '..self.score, lw, 2, ALIGNMENTS.LEFT, labelTheme)
+	c_hud:addChild(l_score, 1, 2 + lw * 2)
+	local l_combo = UI:newLabel('hud', 'COMBO '..self.combo, lw, 2, ALIGNMENTS.LEFT, labelTheme)
+	c_hud:addChild(l_combo, 1, 2 + lw * 3)
 
 	self.layers.hud = {
 		layerName = 'hud',
