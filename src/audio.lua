@@ -15,6 +15,8 @@ function Audio:loadSfx()
 		bounce_3 = love.audio.newSource('assets/sfx/bounce_3.wav', 'static'),
 		fail = love.audio.newSource('assets/sfx/fail.wav', 'static'),
 		powerup = love.audio.newSource('assets/sfx/powerup.wav', 'static'),
+		expl_wind = love.audio.newSource('assets/sfx/explosion_wind.wav', 'static'),
+		explosion = love.audio.newSource('assets/sfx/fail.wav', 'static'),
 	}
 	self:setVolume()
 end

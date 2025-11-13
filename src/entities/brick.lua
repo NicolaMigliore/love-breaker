@@ -117,6 +117,9 @@ function Brick:collide(offset, bricks)
 		self.lives = 1
 		self.collision = false
 
+		-- play sound
+		AUDIO.sfx.expl_wind:stop()
+		AUDIO.sfx.expl_wind:play()
 
 		Flux.to(self, .5, { scale = 1.2 })
 			:ease('elasticin')
@@ -134,6 +137,9 @@ function Brick:collide(offset, bricks)
 						brick:collide(impactVector:normalized(), bricks)
 					end
 				end
+				-- play sound
+				AUDIO.sfx.explosion:stop()
+				AUDIO.sfx.explosion:play()
 			end)
 	elseif self.type == BrickTypes.drop then
 		-- spawn new drop entity
